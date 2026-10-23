@@ -1,0 +1,10 @@
+services:
+  # Lean toolchain for development: `docker compose -f docker/compose.yaml run --rm lean lake build`
+  lean:
+    build:
+      context: ..
+      dockerfile: docker/lean.Dockerfile
+    image: tactile-lean
+    volumes:
+      - ../lean:/work
+    working_dir: /work

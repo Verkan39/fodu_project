@@ -1,0 +1,16 @@
+name = "tactile"
+version = "0.1.0"
+defaultTargets = ["Tactile", "TactileTests", "demo"]
+
+# The game's core: board, blocks and the three moves.
+[[lean_lib]]
+name = "Tactile"
+
+# Checked facts about the moves. If any of them is false, `lake build` fails.
+[[lean_lib]]
+name = "TactileTests"
+
+# Prints a few boards before and after moves, so we can see them run.
+[[lean_exe]]
+name = "demo"
+root = "Demo"
