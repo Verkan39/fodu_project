@@ -259,16 +259,13 @@ h3.h3 { font-size: 20px; line-height: 28px; font-weight: 500; }
 
 .title { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 560px); gap: 56px; align-items: center; min-height: 100vh; padding-top: 0; }
 .title .copy { display: flex; flex-direction: column; gap: 22px; align-items: flex-start; }
-.chip { display: inline-block; padding: 7px 16px; background: var(--paper-shade); border-radius: 999px; font-size: 13px; line-height: 18px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-soft); font-weight: 500; }
 .title h1 { font-size: clamp(64px, 8vw, 104px); line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
 .title .tagline { font-size: 20px; line-height: 30px; color: var(--ink-soft); max-width: 520px; }
 .title .ctas { display: flex; gap: 16px; }
 .title .foot { font-size: 13px; color: var(--ink-soft); margin-top: 38px; }
 .mini-row { display: flex; gap: 12px; }
-.hero-wrap { position: relative; justify-self: center; padding-bottom: 130px; }
+.hero-wrap { position: relative; justify-self: center; }
 .hero-wrap .tray { padding: 30px; border-radius: 24px; }
-.code-peek { position: absolute; left: -90px; bottom: 0; background: var(--ink); color: var(--on-dark); font-family: var(--mono); font-size: 16px; line-height: 34px; border-radius: 12px; padding: 14px 24px 14px 18px; box-shadow: 0 10px 24px rgba(42, 36, 32, 0.14); }
-.code-peek span.n { color: #6f6458; margin-right: 16px; }
 
 /* ---------- level map ---------- */
 

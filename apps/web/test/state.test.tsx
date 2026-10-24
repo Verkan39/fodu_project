@@ -144,7 +144,11 @@ describe('the browser verifier', () => {
 describe('every screen renders without crashing', () => {
   const noop = () => {};
   it('title, level map, rules', () => {
-    expect(renderToString(<Title go={noop} source="browser" />)).toContain('Tactile');
+    const title = renderToString(<Title go={noop} source="browser" />);
+    expect(title).toContain('Tactile');
+    // removed in the Figma file: the "Syntax Error 2026" chip and the black code box over the board
+    expect(title).not.toMatch(/syntax/i);
+    expect(title).not.toContain('code-peek');
     // React's server renderer puts <!-- --> between text pieces; drop them before comparing.
     const map = renderToString(<LevelMap progress={recordClear(emptyProgress, 'L1', 3)} go={noop} />).replace(/<!-- -->/g, '');
     expect(map).toContain('1 / 6 cleared');

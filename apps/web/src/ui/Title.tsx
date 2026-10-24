@@ -8,15 +8,12 @@ import { BoardView } from './Board.tsx';
 const SAMPLE_BLOCKS: readonly [Color, number][] = [['yellow', 0], ['blue', 1], ['pink', 2], ['green', 3], ['white', 0]];
 const sample: Block[] = SAMPLE_BLOCKS.map(([color, turns], id) => ({ id, color, turns }));
 
-const PEEK = ['swap 2 8', 'rotate 4', 'paint 6 green'];
-
 export function Title({ go, source }: { go: (r: Route) => void; source: Source }) {
   const hero = LEVELS[0]!;
   return (
     <div className="screen">
       <div className="title">
         <div className="copy">
-          <span className="chip">Syntax Error 2026 · Functional Programming</span>
           <div className="mini-row">
             {sample.map((b) => (
               <div key={b.id} style={{ ['--cell' as string]: '44px' }}>
@@ -38,11 +35,6 @@ export function Title({ go, source }: { go: (r: Route) => void; source: Source }
         </div>
         <div className="hero-wrap">
           <BoardView board={hero.start} level={hero} size="hero" />
-          <div className="code-peek" aria-hidden="true">
-            {PEEK.map((l, i) => (
-              <div key={l}><span className="n">{i + 1}</span>{l}</div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
