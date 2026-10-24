@@ -16,7 +16,7 @@ export function Title({ go, source }: { go: (r: Route) => void; source: Source }
         <div className="copy">
           <div className="mini-row">
             {sample.map((b) => (
-              <div key={b.id} style={{ ['--cell' as string]: '44px' }}>
+              <div key={b.id} style={{ ['--cell' as string]: 'calc(44 * var(--px))' }}>
                 <BlockView block={b} locked={false} still />
               </div>
             ))}

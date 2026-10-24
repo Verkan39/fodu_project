@@ -53,7 +53,16 @@ export type Outcome =
   /** Not a command we understand. `editor` says which editor the line is in. */
   | { readonly status: 'invalid'; readonly editor: Editor; readonly line: number; readonly reason: string }
   /** Correct, but longer than the level allows. */
-  | { readonly status: 'tooLong'; readonly lines: number; readonly limit: number };
+  | { readonly status: 'tooLong'; readonly lines: number; readonly limit: number }
+  /* The four below come only from Lean (`engine/lean.ts`); this simulator never produces them. */
+  /** The proof compiled but cheated (`sorry` or a forbidden axiom). Never a clear. */
+  | { readonly status: 'rejected'; readonly reason: string }
+  /** Lean didn't finish in time. Never a clear. */
+  | { readonly status: 'timeout'; readonly seconds: number }
+  /** Lean said something the server or the page couldn't read. Never a clear. */
+  | { readonly status: 'error'; readonly detail: string }
+  /** The page couldn't reach the proof checker (offline, busy or not started). Never a clear. */
+  | { readonly status: 'unavailable'; readonly detail: string };
 
 export interface RunResult {
   /** The lines that were played, in order. Stops before an illegal line. */

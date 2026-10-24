@@ -4,7 +4,9 @@
   "type": "module",
   "description": "Builds the Lean file for a player's proof and decides the verdict from Lean's output.",
   "scripts": {
+    "start": "node scripts/serve.ts",
     "test": "node --test \"test/*.test.ts\"",
+    "integration": "node --test \"integration/*.test.ts\"",
     "fixtures": "node scripts/run-fixtures.ts",
     "check": "node scripts/check.ts"
   }

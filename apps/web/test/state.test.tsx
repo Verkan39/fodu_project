@@ -137,7 +137,8 @@ describe('routes', () => {
 describe('the browser verifier', () => {
   it('says it is a preview, not Lean', async () => {
     const v = await browserVerifier({ level: L1, helpers: '', proof: SOLUTION });
-    expect(v).toEqual({ outcome: { status: 'cleared', lines: 3 }, source: 'browser' });
+    expect(v).toMatchObject({ outcome: { status: 'cleared', lines: 3 }, source: 'browser' });
+    expect(v.run?.outcome).toEqual(v.outcome);
   });
 });
 

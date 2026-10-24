@@ -1,3 +1,36 @@
+# Local notes, kept out of the repo on purpose
 CLAUDE.md
 LEARNING_LOG.md
 NOTES.md
+
+# Installed packages: recreate with `npm install` (apps/web, apps/server)
+node_modules/
+
+# Build output: recreate with `npm run build` (web) and `lake build` (lean)
+dist/
+.lake/
+*.tsbuildinfo
+
+# Tool caches and test output
+.vite/
+coverage/
+.cache/
+
+# Secrets and machine-specific settings. Commit a `.env.example` instead.
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Docker image exports (`docker save` for the demo backup)
+*.tar

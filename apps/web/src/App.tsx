@@ -1,7 +1,8 @@
 import { useEffect, useReducer, useSyncExternalStore } from 'react';
 import { levelById } from './engine/levels.ts';
 import { loadProgress, saveProgress } from './engine/progress.ts';
-import { browserVerifier, type Source } from './engine/verify.ts';
+import { leanVerifier } from './engine/lean.ts';
+import type { Source } from './engine/verify.ts';
 import { fromHash, toHash, type Route } from './route.ts';
 import { appReducer, emptyDraft, type AppState } from './state.ts';
 import { LevelMap } from './ui/LevelMap.tsx';
@@ -10,11 +11,12 @@ import { Rules } from './ui/Rules.tsx';
 import { Title } from './ui/Title.tsx';
 
 /**
- * Who decides the verdict. Today it is the browser's own simulator. When the server exists,
- * switching to Lean is this one line (plus a `leanVerifier` next to `browserVerifier`).
+ * Who decides the verdict: real Lean on the server, which also sends the boards to play back.
+ * The browser simulator (`browserVerifier` in `engine/verify.ts`) is kept but not connected;
+ * switching back is this one line.
  */
-const verifier = browserVerifier;
-const SOURCE: Source = 'browser';
+const verifier = leanVerifier;
+const SOURCE: Source = 'lean';
 
 const subscribe = (cb: () => void) => {
   window.addEventListener('hashchange', cb);

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { Block, Color } from '../engine/types.ts';
 import type { Route } from '../route.ts';
 import { BlockView } from './Block.tsx';
+import { DiffOutline } from './Board.tsx';
 
 type Spec = readonly [Color, number];
 
@@ -184,9 +185,9 @@ export function Rules({ go }: { go: (r: Route) => void }) {
 /** A red-hatched block, as an illegal move draws it. */
 function Hatch() {
   return (
-    <div style={{ position: 'relative', width: 40, height: 40 }}>
+    <div style={{ position: 'relative', width: 'calc(40 * var(--px))', height: 'calc(40 * var(--px))' }}>
       <BlockView block={{ id: 0, color: 'yellow', turns: 0 }} locked={false} still />
-      <div className="cell-red" style={{ ['--cell' as string]: '40px' }} />
+      <div className="cell-red" style={{ ['--cell' as string]: 'calc(40 * var(--px))' }} />
     </div>
   );
 }
@@ -194,9 +195,9 @@ function Hatch() {
 /** A block with the dashed outline that marks "still differs". */
 function Dashed() {
   return (
-    <div style={{ position: 'relative', width: 40, height: 40 }}>
+    <div style={{ position: 'relative', width: 'calc(40 * var(--px))', height: 'calc(40 * var(--px))' }}>
       <BlockView block={{ id: 0, color: 'pink', turns: 2 }} locked={false} still />
-      <div className="cell-diff" style={{ ['--cell' as string]: '40px' }} />
+      <DiffOutline cell={40} />
     </div>
   );
 }

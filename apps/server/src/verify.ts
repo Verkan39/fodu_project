@@ -9,6 +9,7 @@ import { countLines, parseScript } from './script.ts';
 import { buildFile, LIMIT_MARK, type LevelId, type Target } from './template.ts';
 import { LeanTimeout, runLean, TIME_LIMIT_SECONDS } from './lean.ts';
 import { classify, type LeanMessage, type Verdict } from './verdict.ts';
+import { readTrace, type Trace } from './trace.ts';
 
 export interface Attempt {
   /** The helper editor's text. */
@@ -21,6 +22,12 @@ export interface Attempt {
 
 export interface Checked {
   verdict: Verdict;
+  /** Lines counted against the limit. Absent when the text didn't parse. */
+  lines?: number;
+  /** The level's line limit, `null` for none. Absent when Lean didn't run or didn't say. */
+  limit?: number | null;
+  /** The board after each move, and where the run stopped. Absent when Lean didn't run. */
+  trace?: Trace;
   /** Only when Lean ran, for debugging tools. */
   source?: string;
   messages?: LeanMessage[];
@@ -43,18 +50,43 @@ export async function verify(attempt: Attempt): Promise<Checked> {
     throw err;
   }
   const verdict = classify(messages, layout);
+  const lines = countLines(parsed.script);
+  const rawLimit = readLimit(messages);
+  const limit = rawLimit === undefined ? undefined : rawLimit === 0 ? null : rawLimit;
+  const trace = readTrace(messages);
+  const extra = { lines, limit, trace, source, messages };
+
+  const disagreement = trace === undefined ? undefined : disagrees(verdict, trace);
+  if (disagreement !== undefined) {
+    return { verdict: { status: 'error', detail: `the proof check and the trace disagree: ${disagreement}` }, ...extra };
+  }
 
   if (verdict.status === 'cleared') {
-    const limit = readLimit(messages);
     if (limit === undefined) {
-      return { verdict: { status: 'error', detail: "Lean didn't report the level's line limit" }, source, messages };
+      return { verdict: { status: 'error', detail: "Lean didn't report the level's line limit" }, ...extra };
     }
-    const lines = countLines(parsed.script);
-    if (limit > 0 && lines > limit) {
-      return { verdict: { status: 'tooLong', lines, limit }, source, messages };
+    if (limit !== null && lines > limit) {
+      return { verdict: { status: 'tooLong', lines, limit }, ...extra };
     }
   }
-  return { verdict, source, messages };
+  return { verdict, ...extra };
+}
+
+/**
+ * The verdict comes from Lean checking the proof, the trace from Lean running `Move.step`. Both
+ * use the same rules, so they should always agree; if they don't, neither can be trusted.
+ */
+function disagrees(verdict: Verdict, trace: Trace): string | undefined {
+  switch (verdict.status) {
+    case 'cleared':
+      return trace.stop === null && trace.differing.length === 0 ? undefined : 'cleared, but the trace does not reach the target';
+    case 'mismatch':
+      return trace.stop === null && trace.differing.length > 0 ? undefined : 'mismatch, but the trace stopped or reached the target';
+    case 'illegal':
+      return trace.stop?.line === verdict.line ? undefined : `illegal on line ${verdict.line}, trace stopped on ${trace.stop?.line ?? 'no line'}`;
+    default:
+      return undefined;
+  }
 }
 
 /** The limit printed by the file's last line. 0 means the level has no limit. */

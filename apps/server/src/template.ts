@@ -20,11 +20,13 @@
  *          (blank)
  *          #print axioms sol
  *          #eval ...                 <- prints the level's line limit (see `LIMIT_MARK`)
+ *          #eval ...                 <- prints the trace: board after each move (`trace.ts`)
  *
  * Proof lines map one to one onto file lines, so a Lean error on file line 7 is an error on
  * editor line `7 - firstLine + 1`. Blank and comment lines become blank file lines for that reason.
  */
 import { COLORS, type Cell, type Helper, type Script, type Step } from './script.ts';
+import { expandMoves, TRACE_MARK, type Move } from './trace.ts';
 
 /** Where things sit in the generated file. All numbers are 1-based file lines. */
 export interface Layout {
@@ -96,6 +98,30 @@ function step(s: Step, keywords: Keywords): string {
   }
 }
 
+/** A plain move as a Lean term, for the trace. Checked for the same reason as `cell`. */
+function moveTerm(m: Move): string {
+  const n = (v: number) => {
+    if (!Number.isInteger(v) || v < 0) throw new Error(`not a cell number: ${v}`);
+    return String(v);
+  };
+  switch (m.kind) {
+    case 'swap':
+      return `Tactile.Move.swap ${n(m.a)} ${n(m.b)}`;
+    case 'paint':
+      if (!COLORS.includes(m.color)) throw new Error(`not a colour: ${m.color}`);
+      return `Tactile.Move.paint ${n(m.cell)} Tactile.Color.${m.color}`;
+    case 'rotate':
+      return `Tactile.Move.rotate ${n(m.cell)}`;
+  }
+}
+
+/** The line that prints the trace (`trace.ts`): every move, tagged with its proof line. */
+function traceLine(script: Script, target: Target): string {
+  const moves = expandMoves(script).map(({ line, move }) => `(${line}, ${moveTerm(move)})`);
+  const list = `([${moves.join(', ')}] : List (Nat × Tactile.Move))`;
+  return `#eval IO.println ("${TRACE_MARK} " ++ Tactile.Trace.run level start (${target}) ${list})`;
+}
+
 /** The parameter is always printed as `i`, whatever the player called it. */
 function helper(h: Helper, k: string, keywords: Keywords): string {
   const head = h.hasParam ? `macro "${k} " i:num` : `macro "${k}"`;
@@ -131,6 +157,7 @@ export function buildFile(
     '',
     '#print axioms sol',
     `#eval IO.println s!"${LIMIT_MARK} {level.lineLimit.getD 0}"`,
+    traceLine(script, target),
     '',
   ].join('\n');
 

@@ -4,7 +4,7 @@ import { countLines, parseScript } from '../../../server/src/script.ts';
 import { describeMove, moveText } from '../engine/messages.ts';
 import { LEVEL_META, nextLevel } from '../engine/levels.ts';
 import type { Progress } from '../engine/progress.ts';
-import { run as simulate, type Outcome } from '../engine/run.ts';
+import type { Outcome } from '../engine/run.ts';
 import type { Verifier } from '../engine/verify.ts';
 import type { Level, LevelId } from '../engine/types.ts';
 import type { Route } from '../route.ts';
@@ -43,15 +43,21 @@ export function PlayScreen({ level, draft, progress, verifier, onDraft, onClear,
   const meta = LEVEL_META[level.id];
   const reduce = useReducedMotion() ?? false;
   const running = play.phase === 'running';
+  const checking = play.phase === 'checking';
+  const busy = running || checking;
 
-  /* ---- the run: simulate now (for the animation), ask the verifier for the verdict ---- */
+  /* ---- the run: ask the verifier, then play back the boards it sent ---- */
   const start = () => {
-    if (running) return;
-    const result = simulate(level, draft.helpers, draft.proof);
+    if (busy) return;
     const seq = state.seq + 1;
-    dispatch({ type: 'run', run: result });
+    dispatch({ type: 'check' });
     void verifier({ level, helpers: draft.helpers, proof: draft.proof }).then((verified) =>
-      dispatch({ type: 'verified', seq, verified }),
+      dispatch({
+        type: 'checked',
+        seq,
+        verified,
+        run: verified.run ?? { played: [], final: level.start, outcome: verified.outcome },
+      }),
     );
   };
   const startRef = useRef(start);
@@ -93,7 +99,7 @@ export function PlayScreen({ level, draft, progress, verifier, onDraft, onClear,
     const parsed = parseScript(draft.helpers, draft.proof);
     return parsed.ok ? countLines(parsed.script) : undefined;
   }, [draft.helpers, draft.proof]);
-  const lines = play.phase === 'ready' ? live : (play.run.lines ?? live);
+  const lines = play.phase === 'ready' || play.phase === 'checking' ? live : (play.run.lines ?? live);
 
   const board = shownBoard(level, play);
   const red = redCells(play);
@@ -173,8 +179,8 @@ export function PlayScreen({ level, draft, progress, verifier, onDraft, onClear,
               <button className="btn secondary" disabled={nothingToClear} onClick={() => dispatch({ type: 'askReset' })}>
                 <ResetIcon /> Reset
               </button>
-              <button className={`btn primary${running ? ' busy' : ''}`} disabled={running} onClick={start}>
-                {!running && <PlayIcon />} {running ? 'Running…' : 'Run'}
+              <button className={`btn primary${busy ? ' busy' : ''}`} disabled={busy} onClick={start}>
+                {!busy && <PlayIcon />} {checking ? 'Checking…' : running ? 'Running…' : 'Run'}
               </button>
             </div>
           </div>
@@ -190,7 +196,7 @@ export function PlayScreen({ level, draft, progress, verifier, onDraft, onClear,
                   className="cm-wrap helper"
                   label="Helpers"
                   value={draft.helpers}
-                  readOnly={running}
+                  readOnly={busy}
                   placeholder={'-- name a group of moves, e.g. macro "spin3" : tactic => `(tactic| (rotate 1; rotate 2))'}
                   marks={helperMarks(play)}
                   onChange={(t) => {
@@ -206,7 +212,7 @@ export function PlayScreen({ level, draft, progress, verifier, onDraft, onClear,
                 className="cm-wrap proof"
                 label="Proof"
                 value={draft.proof}
-                readOnly={running}
+                readOnly={busy}
                 placeholder="-- one move per line, e.g. swap 1 3"
                 marks={proofMarks(play)}
                 onLineClick={onProofClick}
@@ -259,6 +265,13 @@ function VerdictPanel({ play, level, progress, go, replay }: PanelProps) {
       title: 'Ready when you are',
       text: `Turn the board into the target picture. Write your moves, one per line, then press Run.${meta.helpers ? ' Repeating yourself? Name the repeat in the helper slot.' : ''}`,
     };
+  } else if (play.phase === 'checking') {
+    view = {
+      cls: 'running',
+      badge: '…',
+      title: 'Checking with Lean…',
+      text: 'Lean checks your proof first. Then the board plays it back, one line at a time.',
+    };
   } else if (play.phase === 'running') {
     const line = play.run.played[play.index - 1];
     view =
@@ -305,6 +318,38 @@ function outcomeView(
 ) {
   const meta = LEVEL_META[level.id];
   switch (o.status) {
+    case 'rejected':
+      return {
+        cls: 'invalid',
+        badge: '!',
+        title: 'Lean did not accept this proof',
+        text: `${o.reason.charAt(0).toUpperCase()}${o.reason.slice(1)}.`,
+        note: 'Only proofs made of swap, paint, rotate and your helpers count.',
+      };
+    case 'timeout':
+      return {
+        cls: 'invalid',
+        badge: '!',
+        title: 'Lean took too long',
+        text: `Checking stopped after ${o.seconds} seconds, so this attempt doesn't count.`,
+        note: 'Press Run to try again.',
+      };
+    case 'error':
+      return {
+        cls: 'invalid',
+        badge: '!',
+        title: 'Something went wrong',
+        text: "Lean's answer couldn't be read, so this attempt doesn't count.",
+        note: o.detail,
+      };
+    case 'unavailable':
+      return {
+        cls: 'invalid',
+        badge: '!',
+        title: 'Proof checker offline',
+        text: o.detail,
+        note: 'Your proof is kept. Press Run again when the checker is back.',
+      };
     case 'illegal':
       return {
         cls: 'illegal',

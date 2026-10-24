@@ -1,0 +1,1891 @@
+{
+ "L1_cleared": {
+  "request": {
+   "level": "L1",
+   "proof": "swap 2 8\nrotate 4\npaint 6 green"
+  },
+  "response": {
+   "outcome": {
+    "status": "cleared",
+    "lines": 3
+   },
+   "source": "lean",
+   "trace": {
+    "steps": [
+     {
+      "line": 1,
+      "move": {
+       "kind": "swap",
+       "a": 2,
+       "b": 8
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 7,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "pink",
+        "turns": 3
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 5,
+        "color": "yellow",
+        "turns": 0
+       },
+       {
+        "id": 6,
+        "color": "blue",
+        "turns": 3
+       },
+       {
+        "id": 1,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 8,
+        "color": "green",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 2,
+      "move": {
+       "kind": "rotate",
+       "cell": 4
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 7,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "pink",
+        "turns": 3
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 5,
+        "color": "yellow",
+        "turns": 0
+       },
+       {
+        "id": 6,
+        "color": "blue",
+        "turns": 3
+       },
+       {
+        "id": 1,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 8,
+        "color": "green",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 3,
+      "move": {
+       "kind": "paint",
+       "cell": 6,
+       "color": "green"
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 7,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "pink",
+        "turns": 3
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 0
+       },
+       {
+        "id": 6,
+        "color": "blue",
+        "turns": 3
+       },
+       {
+        "id": 1,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 8,
+        "color": "green",
+        "turns": 1
+       }
+      ]
+     }
+    ],
+    "stop": null,
+    "differing": []
+   }
+  }
+ },
+ "L5_cleared_helper": {
+  "request": {
+   "level": "L5",
+   "helpers": "macro \"fix \" i:num : tactic => `(tactic| (paint $i green; rotate $i; rotate $i))",
+   "proof": "swap 2 7\nfix 7\nfix 1\nfix 4\nfix 13\nfix 16"
+  },
+  "response": {
+   "outcome": {
+    "status": "cleared",
+    "lines": 9
+   },
+   "source": "lean",
+   "trace": {
+    "steps": [
+     {
+      "line": 1,
+      "move": {
+       "kind": "swap",
+       "a": 2,
+       "b": 7
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "yellow",
+        "turns": 0
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "blue",
+        "turns": 1
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "blue",
+        "turns": 1
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 2,
+      "move": {
+       "kind": "paint",
+       "cell": 7,
+       "color": "green"
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "yellow",
+        "turns": 0
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "blue",
+        "turns": 1
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 2,
+      "move": {
+       "kind": "rotate",
+       "cell": 7
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "yellow",
+        "turns": 0
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "blue",
+        "turns": 1
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 2,
+      "move": {
+       "kind": "rotate",
+       "cell": 7
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "yellow",
+        "turns": 0
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "blue",
+        "turns": 1
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 3,
+      "move": {
+       "kind": "paint",
+       "cell": 1,
+       "color": "green"
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 0
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "blue",
+        "turns": 1
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 3,
+      "move": {
+       "kind": "rotate",
+       "cell": 1
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "blue",
+        "turns": 1
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 3,
+      "move": {
+       "kind": "rotate",
+       "cell": 1
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "blue",
+        "turns": 1
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 4,
+      "move": {
+       "kind": "paint",
+       "cell": 4,
+       "color": "green"
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 4,
+      "move": {
+       "kind": "rotate",
+       "cell": 4
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 4,
+      "move": {
+       "kind": "rotate",
+       "cell": 4
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 5,
+      "move": {
+       "kind": "paint",
+       "cell": 13,
+       "color": "green"
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "green",
+        "turns": 0
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 5,
+      "move": {
+       "kind": "rotate",
+       "cell": 13
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 5,
+      "move": {
+       "kind": "rotate",
+       "cell": 13
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "yellow",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 6,
+      "move": {
+       "kind": "paint",
+       "cell": 16,
+       "color": "green"
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "green",
+        "turns": 1
+       }
+      ]
+     },
+     {
+      "line": 6,
+      "move": {
+       "kind": "rotate",
+       "cell": 16
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "green",
+        "turns": 2
+       }
+      ]
+     },
+     {
+      "line": 6,
+      "move": {
+       "kind": "rotate",
+       "cell": 16
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 2
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 2
+       },
+       {
+        "id": 3,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 4,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 1,
+        "color": "green",
+        "turns": 3
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 1
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 9,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 10,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 11,
+        "color": "white",
+        "turns": 0
+       },
+       {
+        "id": 12,
+        "color": "green",
+        "turns": 2
+       },
+       {
+        "id": 13,
+        "color": "blue",
+        "turns": 2
+       },
+       {
+        "id": 14,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 15,
+        "color": "green",
+        "turns": 3
+       }
+      ]
+     }
+    ],
+    "stop": null,
+    "differing": []
+   }
+  }
+ },
+ "L2_illegal": {
+  "request": {
+   "level": "L2",
+   "proof": "swap 2 7\nswap 2 5\nrotate 3"
+  },
+  "response": {
+   "outcome": {
+    "status": "illegal",
+    "line": 2,
+    "why": {
+     "kind": "locked",
+     "cells": [
+      5
+     ]
+    },
+    "cells": [
+     2,
+     5
+    ],
+    "message": "Cell 5 is locked and can't be moved, painted or rotated."
+   },
+   "source": "lean",
+   "trace": {
+    "steps": [
+     {
+      "line": 1,
+      "move": {
+       "kind": "swap",
+       "a": 2,
+       "b": 7
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 0
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 3,
+        "color": "yellow",
+        "turns": 2
+       },
+       {
+        "id": 4,
+        "color": "pink",
+        "turns": 1
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 0
+       },
+       {
+        "id": 1,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 2
+       }
+      ]
+     }
+    ],
+    "stop": {
+     "line": 2,
+     "why": {
+      "kind": "locked",
+      "cells": [
+       5
+      ]
+     },
+     "cells": [
+      2,
+      5
+     ],
+     "message": "Cell 5 is locked and can't be moved, painted or rotated."
+    },
+    "differing": [
+     3,
+     9
+    ]
+   }
+  }
+ },
+ "L2_illegal_inside_helper": {
+  "request": {
+   "level": "L2",
+   "helpers": "macro \"bad\" : tactic => `(tactic| (rotate 3; swap 2 5))",
+   "proof": "-- the second line calls a helper that breaks halfway\nswap 2 7\nbad"
+  },
+  "response": {
+   "outcome": {
+    "status": "illegal",
+    "line": 3,
+    "why": {
+     "kind": "locked",
+     "cells": [
+      5
+     ]
+    },
+    "cells": [
+     2,
+     5
+    ],
+    "message": "Cell 5 is locked and can't be moved, painted or rotated."
+   },
+   "source": "lean",
+   "trace": {
+    "steps": [
+     {
+      "line": 2,
+      "move": {
+       "kind": "swap",
+       "a": 2,
+       "b": 7
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 0
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 3
+       },
+       {
+        "id": 3,
+        "color": "yellow",
+        "turns": 2
+       },
+       {
+        "id": 4,
+        "color": "pink",
+        "turns": 1
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 0
+       },
+       {
+        "id": 1,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 2
+       }
+      ]
+     },
+     {
+      "line": 3,
+      "move": {
+       "kind": "rotate",
+       "cell": 3
+      },
+      "board": [
+       {
+        "id": 0,
+        "color": "green",
+        "turns": 1
+       },
+       {
+        "id": 6,
+        "color": "pink",
+        "turns": 0
+       },
+       {
+        "id": 2,
+        "color": "white",
+        "turns": 4
+       },
+       {
+        "id": 3,
+        "color": "yellow",
+        "turns": 2
+       },
+       {
+        "id": 4,
+        "color": "pink",
+        "turns": 1
+       },
+       {
+        "id": 5,
+        "color": "green",
+        "turns": 0
+       },
+       {
+        "id": 1,
+        "color": "blue",
+        "turns": 0
+       },
+       {
+        "id": 7,
+        "color": "yellow",
+        "turns": 3
+       },
+       {
+        "id": 8,
+        "color": "blue",
+        "turns": 2
+       }
+      ]
+     }
+    ],
+    "stop": {
+     "line": 3,
+     "why": {
+      "kind": "locked",
+      "cells": [
+       5
+      ]
+     },
+     "cells": [
+      2,
+      5
+     ],
+     "message": "Cell 5 is locked and can't be moved, painted or rotated."
+    },
+    "differing": [
+     9
+    ]
+   }
+  }
+ }
+}

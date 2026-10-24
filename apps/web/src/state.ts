@@ -51,6 +51,8 @@ export type Seq = number;
 
 export type Play =
   | { readonly phase: 'ready' }
+  /** Waiting for Lean. Its answer brings the verdict and the boards to play back. */
+  | { readonly phase: 'checking'; readonly seq: Seq }
   /** `index` lines have been shown so far. */
   | { readonly phase: 'running'; readonly seq: Seq; readonly run: RunResult; readonly index: number; readonly verified?: Verified }
   /** `view`: which played line the player is looking at (an index into `run.played`), or the end. */
@@ -63,6 +65,11 @@ export interface PlayState {
 }
 
 export type PlayAction =
+  /** Run pressed: ask Lean, and wait. */
+  | { type: 'check' }
+  /** Lean answered: the verdict, and the run to play back. Ignored if it's for an older attempt. */
+  | { type: 'checked'; seq: Seq; run: RunResult; verified: Verified }
+  /** A run that is ready at once (the browser simulator, not connected now). */
   | { type: 'run'; run: RunResult }
   | { type: 'tick' }
   | { type: 'verified'; seq: Seq; verified: Verified }
@@ -79,8 +86,22 @@ export const initialPlay: PlayState = { play: { phase: 'ready' }, seq: 0, confir
 export function playReducer(state: PlayState, action: PlayAction): PlayState {
   const { play } = state;
   switch (action.type) {
+    case 'check': {
+      if (play.phase === 'running' || play.phase === 'checking') return state;
+      const seq = state.seq + 1;
+      return { ...state, seq, play: { phase: 'checking', seq } };
+    }
+    case 'checked': {
+      if (play.phase !== 'checking' || play.seq !== action.seq) return state;
+      const { run, verified } = action;
+      const next: Play =
+        run.played.length === 0
+          ? { phase: 'done', seq: play.seq, run, verified, view: null }
+          : { phase: 'running', seq: play.seq, run, verified, index: 0 };
+      return { ...state, play: next };
+    }
     case 'run': {
-      if (play.phase === 'running') return state;
+      if (play.phase === 'running' || play.phase === 'checking') return state;
       const seq = state.seq + 1;
       const next: Play =
         action.run.played.length === 0
@@ -116,6 +137,7 @@ export function playReducer(state: PlayState, action: PlayAction): PlayState {
 export function shownBoard(level: Level, play: Play): Board {
   switch (play.phase) {
     case 'ready':
+    case 'checking':
       return level.start;
     case 'running':
       return play.index === 0 ? level.start : play.run.played[play.index - 1]!.after;
@@ -156,7 +178,7 @@ export function boardFrame(play: Play): 'error' | 'success' | null {
 
 /** What each line of the proof editor shows, as the run goes on. */
 export function proofMarks(play: Play): LineMark[] {
-  if (play.phase === 'ready') return [];
+  if (play.phase === 'ready' || play.phase === 'checking') return [];
   const played = play.run.played;
   if (play.phase === 'running') {
     return played.slice(0, play.index).map((p, i) => ({

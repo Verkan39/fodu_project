@@ -3,3 +3,4 @@ import Tactile.Move
 import Tactile.Proof
 import Tactile.Examples
 import Tactile.Levels
+import Tactile.Trace

@@ -39,7 +39,7 @@ export function LevelMap({ progress, go }: { progress: Progress; go: (r: Route) 
   const levels = LEVELS as readonly PlayLevel[];
   const current = levels.find((l) => !isCleared(progress, l.id))?.id;
   return (
-    <div className="screen">
+    <div className="screen map-screen">
       <header className="map-head">
         <div>
           <button className="btn secondary small" onClick={() => go({ name: 'title' })}><span aria-hidden="true">‹</span> Title</button>
@@ -56,7 +56,7 @@ export function LevelMap({ progress, go }: { progress: Progress; go: (r: Route) 
         <div className="map-row">
           {levels.slice(0, 3).map((l) => <Tile key={l.id} level={l} progress={progress} current={l.id === current} />)}
         </div>
-        <div className="map-row rev">
+        <div className="map-row">
           {levels.slice(3).map((l) => <Tile key={l.id} level={l} progress={progress} current={l.id === current} />)}
         </div>
       </div>
