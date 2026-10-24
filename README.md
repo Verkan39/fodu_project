@@ -2,6 +2,8 @@
 
 A puzzle game where **writing a correct proof is the same thing as solving the puzzle**.
 
+You can experience the game [here](https://16.4.93.48.sslip.io/#/).
+
 Built for **Syntax Error 2026** (Oct 23–25), Functional Programming track, Problem Statement 2: *Proof Puzzle*.
 
 ## How to play
