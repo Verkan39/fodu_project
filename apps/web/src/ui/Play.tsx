@@ -96,11 +96,10 @@ export function PlayScreen({ level, draft, progress, verifier, onDraft, onClear,
   }, []);
 
   /* ---- what to show ---- */
-  const live = useMemo(() => {
+  const lines = useMemo(() => {
     const parsed = parseScript(draft.helpers, draft.proof);
     return parsed.ok ? countLines(parsed.script) : undefined;
   }, [draft.helpers, draft.proof]);
-  const lines = play.phase === 'ready' || play.phase === 'checking' ? live : (play.run.lines ?? live);
 
   const board = shownBoard(level, play);
   const red = redCells(play);
@@ -287,7 +286,7 @@ function VerdictPanel({ play, level, progress, go, replay }: PanelProps) {
     if (o === undefined) {
       view = { cls: 'running', badge: '…', title: 'Checking…', text: 'Waiting for the verdict.' };
     } else {
-      view = outcomeView(o, level, play.verified?.source === 'browser', progress, replay, go);
+      view = outcomeView(o, level, progress, replay, go);
     }
   }
 
@@ -307,7 +306,6 @@ function VerdictPanel({ play, level, progress, go, replay }: PanelProps) {
 function outcomeView(
   o: Outcome,
   level: Level & { id: LevelId },
-  preview: boolean,
   progress: Progress,
   replay: () => void,
   go: (r: Route) => void,
@@ -387,7 +385,6 @@ function outcomeView(
         badge: <CheckIcon />,
         title: 'Level cleared!',
         text: `The board matches the target, in ${plural(o.lines, 'line', 'lines')}${level.lineLimit !== null ? ` (limit ${level.lineLimit})` : ''}.${best !== undefined ? ` Your best: ${plural(Math.min(best, o.lines), 'line', 'lines')}.` : ''}`,
-        note: preview ? 'Checked in your browser. Real Lean will confirm it once the server is connected.' : undefined,
         actions: (
           <div className="vactions">
             <button className="btn secondary" onClick={replay}>Replay</button>

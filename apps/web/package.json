@@ -2,7 +2,7 @@
   "name": "tactile-web",
   "private": true,
   "type": "module",
-  "description": "The Tactile game in the browser: levels, a pure simulator, and the play screens.",
+  "description": "The Tactile game in the browser: levels and the play screens. Real Lean on the server checks every proof.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

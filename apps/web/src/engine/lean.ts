@@ -120,7 +120,7 @@ function isOutcome(x: unknown): x is Outcome {
 
 /** An outcome the page made up itself (no answer from Lean): nothing to play back. */
 function noAnswer(level: Level, outcome: Outcome): Verified {
-  return { outcome, source: 'lean', run: { played: [], final: level.start, outcome } };
+  return { outcome, run: { played: [], final: level.start, outcome } };
 }
 
 export function makeLeanVerifier(post: typeof fetch = (...args) => fetch(...args)): Verifier {
@@ -154,7 +154,7 @@ export function makeLeanVerifier(post: typeof fetch = (...args) => fetch(...args
       return noAnswer(level, { status: 'error', detail: "The proof checker's answer couldn't be read." });
     }
     const trace = body.trace as LeanTrace | null;
-    return { outcome: body.outcome, source: 'lean', run: runFromLean(level, proof, body.outcome, trace) };
+    return { outcome: body.outcome, run: runFromLean(level, proof, body.outcome, trace) };
   };
 }
 

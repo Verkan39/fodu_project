@@ -30,7 +30,6 @@ Cells are numbered **from 1**, in reading order. On a 3×3 board, cell 1 is top-
 | Proof layer: each proof line is a move | Lean 4 tactics | 🟢 Done: a proof compiles, or fails on the right line |
 | Verdict: cleared, illegal move, invalid command, wrong board | Node + TypeScript | 🟢 Done and tested against real Lean |
 | Helpers and line counting | Lean 4 macros | ⏸️ On hold |
-| In-browser simulator | TypeScript (pure functions) | ⏸️ On hold |
 | Board after each line, as JSON | Lean 4 | ⚪ Planned |
 | Web app | React, Vite, CodeMirror 6 | ⚪ Planned |
 | Verify API with a sandboxed Lean runner | Node + TypeScript | ⚪ Planned |
@@ -148,18 +147,16 @@ apps/server/             Node + TypeScript, no dependencies
   test/                  unit tests
   scripts/run-fixtures.ts  checks every fixture against real Lean
 apps/web/                React + Vite + CodeMirror: the game in the browser
-  src/engine/            pure TypeScript: levels, moves, `run` (the simulator), progress, verifier
+  src/engine/            levels, progress, and the Lean verifier client
   src/data/levels.json   the six levels, printed from Lean by lean/Export.lean
   src/state.ts           the reducers (play screen, app) as pure functions
   src/ui/                title, level map, rules, play screen, board, block, editor
-  test/                  engine tests (including every Lean fixture) and screen render tests
+  test/                  level, state and screen tests, using answers recorded from real Lean
 lean/Export.lean         prints the levels (and their reference solutions) as JSON
 docker/
   lean.Dockerfile        Lean dev image
   compose.yaml           `lean` service
 ```
-
-Still planned: the HTTP API (`POST /api/verify`), so the browser can ask real Lean. Until then the web app checks proofs with its own simulator and says so on screen.
 
 ### 6. Run the web app
 
@@ -167,7 +164,7 @@ Still planned: the HTTP API (`POST /api/verify`), so the browser can ask real Le
 cd apps/web
 npm install
 npm run dev            # http://localhost:5173
-npm test               # 84 tests: the simulator plays every Lean fixture and gets Lean's verdict
+npm test               # level, state and screen tests
 npm run build          # type-checks, then builds into dist/
 ```
 
@@ -176,7 +173,6 @@ If the levels change in `lean/Tactile/Levels.lean`, print them again:
 ```bash
 docker compose -f docker/compose.yaml run --rm lean lake build Tactile
 docker compose -f docker/compose.yaml run --rm -T lean lake env lean --run Export.lean > apps/web/src/data/levels.json
-docker compose -f docker/compose.yaml run --rm -T lean lake env lean --run Export.lean solutions > apps/web/test/data/solutions.json
 ```
 
 ## Troubleshooting

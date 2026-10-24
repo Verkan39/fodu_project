@@ -53,9 +53,6 @@ function decode(id: Level['id']): Level {
 
 export const LEVELS: readonly PlayLevel[] = LEVEL_IDS.map((id) => decode(id) as PlayLevel);
 
-/** The small sample level the Lean tests use. Only for tests. */
-export const EXAMPLE_LEVEL: Level = decode('example');
-
 export const levelById = (id: LevelId): PlayLevel => LEVELS.find((l) => l.id === id)!;
 
 export interface LevelMeta {

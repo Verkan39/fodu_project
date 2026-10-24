@@ -1,7 +1,4 @@
-/**
- * The data the game works on. Everything here is plain, read-only data: a move never edits a
- * board, it returns a new one (the same idea as `Move.apply` in `lean/Tactile/Move.lean`).
- */
+/** The data the game works on. Everything here is plain, read-only data. */
 import type { Color } from '../../../server/src/script.ts';
 
 export type { Color };

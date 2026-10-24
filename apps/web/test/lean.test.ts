@@ -81,7 +81,6 @@ describe('the Lean verifier', () => {
     const { level, request, response } = replay('L5_cleared_helper');
     const post = answering(response);
     const v = await makeLeanVerifier(post)({ level, helpers: request.helpers!, proof: request.proof });
-    expect(v.source).toBe('lean');
     expect(v.outcome).toEqual({ status: 'cleared', lines: 9 });
     expect(v.run!.played).toHaveLength(6);
     const [url, init] = (post as unknown as ReturnType<typeof vi.fn>).mock.calls[0] as [string, RequestInit];

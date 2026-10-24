@@ -2,7 +2,6 @@ import { useEffect, useReducer, useSyncExternalStore } from 'react';
 import { levelById } from './engine/levels.ts';
 import { loadProgress, saveProgress } from './engine/progress.ts';
 import { leanVerifier } from './engine/lean.ts';
-import type { Source } from './engine/verify.ts';
 import { fromHash, toHash, type Route } from './route.ts';
 import { appReducer, startDraft, type AppState } from './state.ts';
 import { LevelMap } from './ui/LevelMap.tsx';
@@ -10,13 +9,8 @@ import { PlayScreen } from './ui/Play.tsx';
 import { Rules } from './ui/Rules.tsx';
 import { Title } from './ui/Title.tsx';
 
-/**
- * Who decides the verdict: real Lean on the server, which also sends the boards to play back.
- * The browser simulator (`browserVerifier` in `engine/verify.ts`) is kept but not connected;
- * switching back is this one line.
- */
+/** Who decides the verdict: real Lean on the server, which also sends the boards to play back. */
 const verifier = leanVerifier;
-const SOURCE: Source = 'lean';
 
 const subscribe = (cb: () => void) => {
   window.addEventListener('hashchange', cb);
@@ -46,7 +40,7 @@ export default function App() {
 
   switch (route.name) {
     case 'title':
-      return <Title go={go} source={SOURCE} />;
+      return <Title go={go} />;
     case 'levels':
       return <LevelMap progress={app.progress} go={go} />;
     case 'rules':

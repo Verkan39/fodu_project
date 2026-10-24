@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { renderToString } from 'react-dom/server';
 import { levelById, LEVELS } from '../src/engine/levels.ts';
 import { emptyProgress, recordClear } from '../src/engine/progress.ts';
-import { run } from '../src/engine/run.ts';
-import { browserVerifier } from '../src/engine/verify.ts';
+import answers from './data/lean-answers.json';
+import { runFromLean, type LeanTrace } from '../src/engine/lean.ts';
+import type { Outcome, RunResult } from '../src/engine/run.ts';
+import type { Verifier } from '../src/engine/verify.ts';
 import { fromHash, toHash, type Route } from '../src/route.ts';
 import {
   appReducer,
@@ -28,13 +30,22 @@ import { countLines, parseScript } from '../../server/src/script.ts';
 
 const L1 = levelById('L1');
 const L2 = levelById('L2');
-const SOLUTION = 'swap 2 8\nrotate 4\npaint 6 green';
 const feed = (s: PlayState, ...actions: PlayAction[]) => actions.reduce(playReducer, s);
+
+type Recorded = { request: { level: string; proof: string }; response: { outcome: Outcome; trace: LeanTrace | null } };
+/** A run built from an answer recorded from real Lean (`data/lean-answers.json`). */
+function lean(name: string): RunResult {
+  const { request, response } = (answers as unknown as Record<string, Recorded>)[name]!;
+  return runFromLean(levelById(request.level as 'L1'), request.proof, response.outcome, response.trace);
+}
+const answered = (r: RunResult, seq = 1): PlayAction => ({ type: 'checked', seq, run: r, verified: { outcome: r.outcome, run: r } });
+/** Run pressed, then Lean's answer arrives. */
+const started = (r: RunResult) => feed(initialPlay, { type: 'check' }, answered(r));
 
 describe('the play state machine', () => {
   it('walks ready → running → done, one tick per line, and ends on the final board', () => {
-    const r = run(L1, '', SOLUTION);
-    let s = feed(initialPlay, { type: 'run', run: r });
+    const r = lean('L1_cleared');
+    let s = started(r);
     expect(s.play.phase).toBe('running');
     expect(shownBoard(L1, s.play)).toBe(L1.start);
 
@@ -50,50 +61,47 @@ describe('the play state machine', () => {
     expect(proofMarks(s.play).map((m) => m.kind)).toEqual(['ok', 'ok', 'ok']);
   });
 
-  it('ignores a late verdict from an older run, and a run while running', () => {
-    const r = run(L1, '', SOLUTION);
-    let s = feed(initialPlay, { type: 'run', run: r });
-    const again = feed(s, { type: 'run', run: r });
-    expect(again).toBe(s);
-    const verified = { outcome: r.outcome, source: 'browser' as const };
-    expect(feed(s, { type: 'verified', seq: 99, verified }).play).toBe(s.play);
-    s = feed(s, { type: 'verified', seq: s.seq, verified });
-    expect(s.play).toMatchObject({ verified });
+  it('ignores an answer for an older attempt, and Run while running', () => {
+    const r = lean('L1_cleared');
+    const checking = feed(initialPlay, { type: 'check' });
+    expect(feed(checking, answered(r, 99))).toBe(checking);
+    const s = started(r);
+    expect(feed(s, { type: 'check' })).toBe(s);
   });
 
   it('editing after a result goes back to the start board, and a stale verdict is dropped', () => {
-    const r = run(L1, '', SOLUTION);
-    let s = feed(initialPlay, { type: 'run', run: r }, { type: 'tick' }, { type: 'tick' }, { type: 'tick' }, { type: 'tick' });
+    const r = lean('L1_cleared');
+    let s = feed(started(r), { type: 'tick' }, { type: 'tick' }, { type: 'tick' }, { type: 'tick' });
     expect(s.play.phase).toBe('done');
     s = feed(s, { type: 'edited' });
     expect(s.play.phase).toBe('ready');
-    const late = feed(s, { type: 'verified', seq: s.seq, verified: { outcome: r.outcome, source: 'browser' } });
+    const late = feed(s, answered(r, s.seq));
     expect(late.play.phase).toBe('ready');
   });
 
   it('a proof with nothing to play finishes at once, showing the start board', () => {
-    const r = run(L1, '', '-- nothing here');
-    const s = feed(initialPlay, { type: 'run', run: r });
+    const r = runFromLean(L1, '-- nothing here', { status: 'mismatch', differing: [2] }, { steps: [], stop: null });
+    const s = started(r);
     expect(s.play.phase).toBe('done');
     expect(shownBoard(L1, s.play)).toBe(L1.start);
-    expect(r.outcome.status).toBe('mismatch');
   });
 
-  it('marks the illegal line, reddens only the touched cells, and frames a missing cell', () => {
-    const r = run(L2, '', 'rotate 1\nswap 1 12');
-    let s = feed(initialPlay, { type: 'run', run: r });
-    s = feed(s, { type: 'tick' }, { type: 'tick' }, { type: 'tick' });
+  it('marks the illegal line, reddens the touched cells, and frames only a missing cell', () => {
+    const r = lean('L2_illegal');
+    const s = feed(started(r), { type: 'tick' }, { type: 'tick' });
     expect(s.play.phase).toBe('done');
-    expect(redCells(s.play)).toEqual([1]);
-    expect(boardFrame(s.play)).toBe('error');
+    expect(redCells(s.play)).toEqual([2, 5]);
+    expect(boardFrame(s.play)).toBe(null);
     expect(proofMarks(s.play)).toContainEqual({ line: 2, kind: 'error', label: 'illegal' });
     // the board stays as it was before the bad line
     expect(shownBoard(L2, s.play)).toBe(r.played[0]!.after);
+    const missing = { ...r, outcome: { ...r.outcome, why: { kind: 'noSuchCell', cells: [12] } } } as RunResult;
+    expect(boardFrame(feed(started(missing), { type: 'tick' }, { type: 'tick' }).play)).toBe('error');
   });
 
   it('lets the player look at the board after any line, then go back', () => {
-    const r = run(L1, '', SOLUTION);
-    let s = feed(initialPlay, { type: 'run', run: r }, { type: 'tick' }, { type: 'tick' }, { type: 'tick' }, { type: 'tick' });
+    const r = lean('L1_cleared');
+    let s = feed(started(r), { type: 'tick' }, { type: 'tick' }, { type: 'tick' }, { type: 'tick' });
     s = feed(s, { type: 'view', index: 0 });
     expect(shownBoard(L1, s.play)).toBe(r.played[0]!.after);
     expect(differingCells(s.play)).toEqual([]);
@@ -150,18 +158,11 @@ describe('routes', () => {
   });
 });
 
-describe('the browser verifier', () => {
-  it('says it is a preview, not Lean', async () => {
-    const v = await browserVerifier({ level: L1, helpers: '', proof: SOLUTION });
-    expect(v).toMatchObject({ outcome: { status: 'cleared', lines: 3 }, source: 'browser' });
-    expect(v.run?.outcome).toEqual(v.outcome);
-  });
-});
-
 describe('every screen renders without crashing', () => {
   const noop = () => {};
+  const never: Verifier = () => new Promise(() => {});
   it('title, level map, rules', () => {
-    const title = renderToString(<Title go={noop} source="browser" />);
+    const title = renderToString(<Title go={noop} />);
     expect(title).toContain('Tactile');
     // removed in the Figma file: the "Syntax Error 2026" chip and the black code box over the board
     expect(title).not.toMatch(/syntax/i);
@@ -177,7 +178,7 @@ describe('every screen renders without crashing', () => {
   for (const level of LEVELS) {
     it(`play screen for ${level.id}`, () => {
       const html = renderToString(
-        <PlayScreen level={level} draft={emptyDraft} progress={emptyProgress} verifier={browserVerifier}
+        <PlayScreen level={level} draft={emptyDraft} progress={emptyProgress} verifier={never}
           onDraft={noop} onClear={noop} onCleared={noop} go={noop} />,
       );
       expect(html).not.toContain('class="verdict');

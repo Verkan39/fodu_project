@@ -1,10 +1,9 @@
 /**
- * What `POST /api/verify` answers, in the **frontend's own shape**: the same `outcome` objects its
- * in-browser simulator produces, so swapping the simulator for the server needs no UI changes.
+ * What `POST /api/verify` answers, in the **frontend's own shape**: the `Outcome` objects in
+ * `apps/web/src/engine/run.ts`, so the UI shows them as they are.
  *
- * Three outcomes only the server can produce, so the UI must add them:
  * `rejected` (the proof cheated), `timeout` (Lean took too long) and `error` (Lean said something
- * we can't read). None of them is ever a clear.
+ * we can't read) are never a clear.
  */
 import type { Editor } from './script.ts';
 import type { Why } from './trace.ts';

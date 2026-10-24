@@ -82,10 +82,7 @@ export type PlayAction =
   | { type: 'check' }
   /** Lean answered: the verdict, and the run to play back. Ignored if it's for an older attempt. */
   | { type: 'checked'; seq: Seq; run: RunResult; verified: Verified }
-  /** A run that is ready at once (the browser simulator, not connected now). */
-  | { type: 'run'; run: RunResult }
   | { type: 'tick' }
-  | { type: 'verified'; seq: Seq; verified: Verified }
   /** The player changed the text, so the old result no longer describes it. */
   | { type: 'edited' }
   | { type: 'view'; index: number | null }
@@ -113,23 +110,10 @@ export function playReducer(state: PlayState, action: PlayAction): PlayState {
           : { phase: 'running', seq: play.seq, run, verified, index: 0 };
       return { ...state, play: next };
     }
-    case 'run': {
-      if (play.phase === 'running' || play.phase === 'checking') return state;
-      const seq = state.seq + 1;
-      const next: Play =
-        action.run.played.length === 0
-          ? { phase: 'done', seq, run: action.run, view: null }
-          : { phase: 'running', seq, run: action.run, index: 0 };
-      return { ...state, seq, play: next };
-    }
     case 'tick': {
       if (play.phase !== 'running') return state;
       if (play.index < play.run.played.length) return { ...state, play: { ...play, index: play.index + 1 } };
       return { ...state, play: { phase: 'done', seq: play.seq, run: play.run, verified: play.verified, view: null } };
-    }
-    case 'verified': {
-      if ((play.phase !== 'running' && play.phase !== 'done') || play.seq !== action.seq) return state;
-      return { ...state, play: { ...play, verified: action.verified } };
     }
     case 'edited':
       return play.phase === 'done' ? { ...state, play: { phase: 'ready' } } : state;
