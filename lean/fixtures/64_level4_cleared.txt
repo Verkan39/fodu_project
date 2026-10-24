@@ -1,0 +1,7 @@
+# expect: cleared
+# level: L4
+swap 1 7
+swap 7 12
+paint 12 green
+swap 2 14
+swap 3 9

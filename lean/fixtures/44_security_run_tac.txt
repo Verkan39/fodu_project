@@ -1,0 +1,3 @@
+# expect: invalid 1
+# note: run_tac can run arbitrary code inside a proof. The parser rejects it, so Lean never sees it.
+run_tac (IO.println "tactic code ran" : IO Unit)

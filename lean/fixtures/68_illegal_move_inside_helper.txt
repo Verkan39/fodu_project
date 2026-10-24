@@ -1,0 +1,5 @@
+# expect: illegal 1
+# level: L2
+# note: an illegal move inside a helper is reported on the line that calls the helper.
+# helper: macro "bad" : tactic => `(tactic| (rotate 3; swap 2 5))
+bad

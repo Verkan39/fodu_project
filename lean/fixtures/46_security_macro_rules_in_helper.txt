@@ -1,0 +1,3 @@
+# expect: invalid helper 1
+# note: macro_rules could redefine our finish or swap.
+# helper: macro_rules | `(tactic| finish) => `(tactic| sorry)

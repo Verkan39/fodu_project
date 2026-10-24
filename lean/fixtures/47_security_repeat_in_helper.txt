@@ -1,0 +1,4 @@
+# expect: invalid helper 1
+# note: repeat/first would let Lean search for the answer and break the line count.
+# helper: macro "auto" : tactic => `(tactic| repeat (first | swap 1 3 | rotate 3))
+auto

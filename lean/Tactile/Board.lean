@@ -35,6 +35,9 @@ structure Level where
   locked  : List Nat
   /-- The colours `paint` may use in this level. -/
   palette : List Color
+  /-- The most lines a solution may have, or `none` for no limit. A helper costs its number
+  of moves and each call costs 1 (Learning Log, Entry 6). -/
+  lineLimit : Option Nat := none
   deriving Repr
 
 /-! ## Drawing a board as text (for the demo and for debugging) -/
