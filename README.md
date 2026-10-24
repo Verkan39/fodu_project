@@ -20,7 +20,7 @@ Cells are numbered **from 1**, in reading order. On a 3×3 board, cell 1 is top-
 - An **illegal move** (a cell that doesn't exist, a locked block, a colour not allowed in the level) turns that block red, and the proof fails at that line.
 - A line that isn't a command at all (a typo such as `swpa 1 2`) is reported as an **invalid command**.
 - The level is **cleared** when Lean accepts the proof **and** the board matches the target.
-- Later levels let you name a **helper** (a reusable group of moves) and call it. Shorter proofs earn more stars, so reusing helpers pays off.
+- Later levels let you name a **helper** (a reusable group of moves) and call it. The game shows how many lines your proof used, and your best for each level.
 
 ### How it works
 
@@ -29,7 +29,7 @@ Cells are numbered **from 1**, in reading order. On a 3×3 board, cell 1 is top-
 | Game rules and proof checking | Lean 4 (core only, no Mathlib) | 🟢 The three moves are done and tested |
 | Proof layer: each proof line is a move | Lean 4 tactics | 🟢 Done: a proof compiles, or fails on the right line |
 | Verdict: cleared, illegal move, invalid command, wrong board | Node + TypeScript | 🟢 Done and tested against real Lean |
-| Helpers and stars | Lean 4 macros | ⏸️ On hold |
+| Helpers and line counting | Lean 4 macros | ⏸️ On hold |
 | In-browser simulator | TypeScript (pure functions) | ⏸️ On hold |
 | Board after each line, as JSON | Lean 4 | ⚪ Planned |
 | Web app | React, Vite, CodeMirror 6 | ⚪ Planned |
@@ -147,12 +147,37 @@ apps/server/             Node + TypeScript, no dependencies
   src/verdict.ts         turns Lean's messages into one verdict
   test/                  unit tests
   scripts/run-fixtures.ts  checks every fixture against real Lean
+apps/web/                React + Vite + CodeMirror: the game in the browser
+  src/engine/            pure TypeScript: levels, moves, `run` (the simulator), progress, verifier
+  src/data/levels.json   the six levels, printed from Lean by lean/Export.lean
+  src/state.ts           the reducers (play screen, app) as pure functions
+  src/ui/                title, level map, rules, play screen, board, block, editor
+  test/                  engine tests (including every Lean fixture) and screen render tests
+lean/Export.lean         prints the levels (and their reference solutions) as JSON
 docker/
   lean.Dockerfile        Lean dev image
   compose.yaml           `lean` service
 ```
 
-These are planned and don't exist yet: `apps/web` (React app) and `levels/` (level definitions). The in-browser simulator is on hold.
+Still planned: the HTTP API (`POST /api/verify`), so the browser can ask real Lean. Until then the web app checks proofs with its own simulator and says so on screen.
+
+### 6. Run the web app
+
+```bash
+cd apps/web
+npm install
+npm run dev            # http://localhost:5173
+npm test               # 84 tests: the simulator plays every Lean fixture and gets Lean's verdict
+npm run build          # type-checks, then builds into dist/
+```
+
+If the levels change in `lean/Tactile/Levels.lean`, print them again:
+
+```bash
+docker compose -f docker/compose.yaml run --rm lean lake build Tactile
+docker compose -f docker/compose.yaml run --rm -T lean lake env lean --run Export.lean > apps/web/src/data/levels.json
+docker compose -f docker/compose.yaml run --rm -T lean lake env lean --run Export.lean solutions > apps/web/test/data/solutions.json
+```
 
 ## Troubleshooting
 
