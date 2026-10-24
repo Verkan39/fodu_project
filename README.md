@@ -1,10 +1,10 @@
-# Tactile *(working title)*
+# Tactile 
 
 A puzzle game where **writing a correct proof is the same thing as solving the puzzle**.
 
 Built for **Syntax Error 2026** (Oct 23–25), Functional Programming track, Problem Statement 2: *Proof Puzzle*.
 
-## What we're building
+## How to play
 
 You get a grid of coloured blocks and a target picture. You solve a level by writing a short **Lean 4** proof where each line is one move:
 
@@ -16,172 +16,171 @@ rotate 6        -- turn the block in cell 6 a quarter turn clockwise
 
 Cells are numbered **from 1**, in reading order. On a 3×3 board, cell 1 is top-left and cell 9 is bottom-right. Cell numbers must be plain numbers: `swap (1+1) 3` is not allowed.
 
-- **Run** plays the moves back one line at a time, so you can watch the board change.
-- An **illegal move** (a cell that doesn't exist, a locked block, a colour not allowed in the level) turns that block red, and the proof fails at that line.
-- A line that isn't a command at all (a typo such as `swpa 1 2`) is reported as an **invalid command**.
-- The level is **cleared** when Lean accepts the proof **and** the board matches the target.
-- Later levels let you name a **helper** (a reusable group of moves) and call it. The game shows how many lines your proof used, and your best for each level.
+- **Run** sends your proof to real Lean. When Lean answers, the board plays your moves back one line at a time.
+- An **illegal move** (a cell that doesn't exist, a locked block, a colour the level doesn't allow) turns that block red, and the proof stops at that line.
+- A line that isn't a command at all (a typo such as `swpa 1 2`) is an **invalid command**. No block moves.
+- The level is **cleared** when Lean accepts the proof **and** the board matches the target, within the level's line limit.
 
-### How it works
+### Helpers
 
-| Part | Tech | Status |
-|---|---|---|
-| Game rules and proof checking | Lean 4 (core only, no Mathlib) | 🟢 The three moves are done and tested |
-| Proof layer: each proof line is a move | Lean 4 tactics | 🟢 Done: a proof compiles, or fails on the right line |
-| Verdict: cleared, illegal move, invalid command, wrong board | Node + TypeScript | 🟢 Done and tested against real Lean |
-| Helpers and line counting | Lean 4 macros | ⏸️ On hold |
-| Board after each line, as JSON | Lean 4 | ⚪ Planned |
-| Web app | React, Vite, CodeMirror 6 | ⚪ Planned |
-| Verify API with a sandboxed Lean runner | Node + TypeScript | ⚪ Planned |
-| Packaging | Docker | 🟢 Lean dev image |
+From level 3 on, you can name a group of moves in the helper slot and use it like a move:
 
-**Real Lean** is the judge of whether a proof is correct.
+```lean
+macro "spin3" : tactic => `(tactic| (rotate 1; rotate 2; rotate 3))
+macro "fix " i:num : tactic => `(tactic| (paint $i green; rotate $i; rotate $i))
+```
 
-## Setup
+Then `spin3` or `fix 7` in the proof. A helper may call helpers defined above it. **Lines count against the level's limit:** each helper costs one line per step, and each proof line costs 1, so a helper only pays off when you reuse it.
 
-Lean runs **inside Docker**, so you don't need to install Lean on your machine.
+## How it works
+
+```
+ browser (React)                 API (Node, apps/server)                    Lean 4 (Docker)
+ ───────────────                 ───────────────────────                    ───────────────
+ editor ── POST /api/verify ──▶  1. parse the text: only our moves and
+                                    helpers are allowed, anything else
+                                    is refused here and never reaches Lean
+                                 2. print a Lean file from the parsed data ─▶ check the proof,
+                                                                             and run the moves
+ board plays it back  ◀── JSON ── 3. verdict + the board after each move ◀── (a fresh container
+ (no game rules in TS)                                                       per proof)
+```
+
+- **Lean is the only judge.** It checks the proof, and it also runs the moves with the same rules (`lean/Tactile/Trace.lean`). The browser has no copy of the rules: it animates the boards Lean sends.
+- **Safety.** The parser accepts only `swap`, `paint`, `rotate`, helper calls, blank lines and `--` comments, so Lean commands such as `#eval`, `run_tac`, `sorry` or `macro_rules` are refused before Lean runs.
+  - Each proof runs in its own container with **no network, 1 GB of memory, 1 CPU, 64 processes and a 15-second time limit**.
+  - The API caps request bodies at 64 KB and runs at most 2 proofs at once (8 more wait in a queue).
+
+## Run it locally
 
 ### Requirements
 
-- **Docker** with **Compose v2** (`docker compose version` should work)
-- **git**
-- **Node.js**, for the verdict scripts. It needs to run `.ts` files directly; we tested on **v26.3.0** only. No packages to install.
-- **About 2 GB of free disk space** for the Lean image (around 900 MB) plus build output. Keep more free than that for the rest of the project.
+- **Docker** with **Compose v2** (`docker compose version` should work), and permission to use it (see Troubleshooting).
+- **Node.js 22.18 or newer.** The API runs its `.ts` files directly. We use Node 24.
+- **git**, and **a few GB of free disk space.** The Lean image is about 1 GB.
 
-### 1. Clone the repo
+### 1. Clone and build Lean (first time only)
 
 ```bash
 git clone <repo-url> tactile
 cd tactile
-```
-
-### 2. Build the Lean image (first time only)
-
-```bash
 docker compose -f docker/compose.yaml build lean
-```
-
-This downloads Debian and the Lean toolchain at the version pinned in `lean/lean-toolchain` (currently **v4.35.0**). It takes a few minutes the first time. You only need to run it again if `lean-toolchain` or the Dockerfile changes.
-
-### 3. Compile and run the tests
-
-```bash
 docker compose -f docker/compose.yaml run --rm lean lake build
 ```
 
-This compiles the game library **and** checks every test. The tests are facts that Lean must prove (`example … := by decide`) or programs that must return `true` (`#guard`), so **if any move behaves wrongly, the build fails**. A successful run ends with:
+The first command downloads the Lean toolchain at the version pinned in `lean/lean-toolchain` (**v4.35.0**). It takes a few minutes, and the "exporting layers" step is slow but not stuck.
 
-```
-Build completed successfully
-```
+The second compiles the game **and** checks every test: facts Lean must prove (`example … := by decide`) and programs that must return `true` (`#guard`). It ends with `Build completed successfully`.
 
-### 4. Run the demo
+**Run `lake build` again after any change under `lean/`.** The API uses the compiled library, so a stale build shows up as "Unknown identifier".
+
+### 2. Start the game
+
+Two terminals:
 
 ```bash
-docker compose -f docker/compose.yaml run --rm lean lake exe demo
+cd apps/server && npm start          # the API on http://127.0.0.1:3001
 ```
 
-It prints the board before and after each move on a sample level. `[ ]` marks a locked cell, letters are colours (Y = yellow, B = blue, P = pink, G = green, W = white), and arrows are facings:
-
-```
-── swap, paint, rotate ──
- Y↑  B↑  P→
- G↑ [W↓] Y←
- B→  P↑  G↑
-
-> swap 1 3
- P→  B↑  Y↑
- ...
+```bash
+cd apps/web && npm install && npm run dev    # the game on http://localhost:5173
 ```
 
-### 5. Check proofs with real Lean (Node)
+Vite forwards `/api` to the API, so the page needs no server address. To point it somewhere else, start Vite with `API_URL=http://host:port`.
+
+### 3. Tests
 
 ```bash
 cd apps/server
-npm test              # 20 quick unit tests, no Docker needed
-npm run fixtures      # runs 29 example proofs through real Lean (about 10 seconds)
+npm test               # parser, file builder, verdict, trace, API routes: no Docker needed
+npm run fixtures       # every proof in lean/fixtures/ through real Lean, each with its expected verdict
+npm run integration    # the API end to end against real Lean, incl. "levels.json matches Levels.lean"
+
+cd ../web
+npm test               # levels, state and screens, using answers recorded from real Lean
+npm run build          # type-checks, then builds into dist/
 ```
 
-To try your own proof and see the verdict:
+### 4. Try a proof from the command line
 
 ```bash
-npm run check -- "swap 1 3" "paint 3 blue" "rotate 3"   # each argument is one line
-npm run check -- "swap 1 3\nrotate 5"                   # or use \n inside one argument
-npm run check -- --help                                 # the sample board, and all options
+cd apps/server
+npm run check -- --level L1 "swap 2 8" "rotate 4" "paint 6 green"     # each argument is one line
+npm run check -- --level L3 \
+  --helper 'macro "spin3" : tactic => `(tactic| (rotate 1; rotate 2; rotate 3))' \
+  "spin3" "spin3" "spin3"
+npm run check -- --help
 ```
 
-Each run starts by drawing the **start board**, the **target board** and the **cell numbers** side by side, so you can see what you are aiming for. Add `--messages` to see what Lean said, `--source` to see the Lean file we generated, and `--target start` to aim for the starting board. If `--target` isn't a valid board, the tool stops with an error (exit code 2) instead of printing a verdict.
+It draws the start board, the target and the cell numbers, then prints the verdict. `--messages` shows what Lean said, `--source` shows the Lean file we generated, and `--file proof.txt` reads the proof from a file.
 
-Each file in `lean/fixtures/` is a player's proof plus the verdict we expect (`# expect: illegal 2`). The second command starts Lean in Docker for each one and checks that the verdict is right. It ends with:
-
-```
-29/29 fixtures gave the expected verdict
-```
-
-### Optional: a shell inside the container
+### 5. Optional
 
 ```bash
-docker compose -f docker/compose.yaml run --rm lean bash
-# inside the container:
-lake build
-lake env lean TactileTests.lean    # check one file
+docker compose -f docker/compose.yaml run --rm lean lake exe demo   # prints boards before and after moves
+docker compose -f docker/compose.yaml run --rm lean bash            # a shell with Lean in it
 ```
 
 ## Project layout
 
 ```
-lean/                    Lean project (mounted into the container at /work)
-  lean-toolchain         pinned Lean version
-  lakefile.toml          build config: Tactile library, tests, demo
-  Tactile/Board.lean     data: Color, Block, Board, Level
-  Tactile/Move.lean      the moves: whyIllegal / Legal, apply, step, runAll, messages
-  Tactile/Proof.lean     the proof layer: Reach, and the tactics swap / paint / rotate / finish
-  Tactile/Examples.lean  a sample level used by the tests and the demo
-  TactileTests.lean      tests (decide proofs + #guard checks)
-  Demo.lean              `lake exe demo`
-  fixtures/              example player proofs, each with the verdict we expect
-apps/server/             Node + TypeScript, no dependencies
-  src/template.ts        wraps a player's lines into the Lean file that checks them
-  src/lean.ts            runs Lean in Docker and reads its JSON messages
-  src/verdict.ts         turns Lean's messages into one verdict
-  test/                  unit tests
-  scripts/run-fixtures.ts  checks every fixture against real Lean
-apps/web/                React + Vite + CodeMirror: the game in the browser
-  src/engine/            levels, progress, and the Lean verifier client
-  src/data/levels.json   the six levels, printed from Lean by lean/Export.lean
-  src/state.ts           the reducers (play screen, app) as pure functions
-  src/ui/                title, level map, rules, play screen, board, block, editor
-  test/                  level, state and screen tests, using answers recorded from real Lean
-lean/Export.lean         prints the levels (and their reference solutions) as JSON
+lean/                       Lean project (mounted into the container at /work)
+  lean-toolchain            pinned Lean version
+  lakefile.toml             build config: Tactile library, tests, demo
+  Tactile/Board.lean        data: Color, Block, Board, Level
+  Tactile/Move.lean         the moves: whyIllegal / Legal, apply, step, runAll, messages
+  Tactile/Proof.lean        the proof layer: Reach, and the tactics swap / paint / rotate / finish
+  Tactile/Levels.lean       the six levels
+  Tactile/Trace.lean        runs a proof's moves and prints the board after each one, as JSON
+  Tactile/Examples.lean     a sample level used by the tests
+  TactileTests.lean         tests for the moves
+  LevelTests.lean           tests for the levels and the trace (solvable, traps, real proofs with helpers)
+  Export.lean               prints the levels as JSON for the web app
+  Demo.lean                 `lake exe demo`
+  fixtures/                 example player proofs, each with the verdict we expect
+apps/server/                Node + TypeScript, no dependencies
+  src/script.ts             parses the player's text: the security boundary
+  src/template.ts           prints the Lean file from the parsed text
+  src/lean.ts               runs Lean in Docker (with the time limit) and reads its JSON messages
+  src/verdict.ts            turns Lean's messages into one verdict
+  src/trace.ts              expands helpers into moves, reads the board trace
+  src/verify.ts             parse → Lean → verdict + trace → line limit
+  src/outcome.ts            the answer in the frontend's shape
+  src/server.ts             the HTTP API
+  scripts/                  serve.ts (`npm start`), check.ts, run-fixtures.ts
+  test/, integration/       unit tests; end-to-end tests against real Lean
+apps/web/                   React + Vite + CodeMirror: the game in the browser
+  src/engine/lean.ts        asks the API and turns Lean's answer into what the screen plays back
+  src/engine/               levels, progress and shared types
+  src/data/levels.json      the six levels, printed by lean/Export.lean
+  src/state.ts              the reducers (play screen, app) as pure functions
+  src/ui/                   title, level map, rules, play screen, board, block, editor
+  test/                     level, state and screen tests, using answers recorded from real Lean
 docker/
-  lean.Dockerfile        Lean dev image
-  compose.yaml           `lean` service
-```
-
-### 6. Run the web app
-
-```bash
-cd apps/web
-npm install
-npm run dev            # http://localhost:5173
-npm test               # level, state and screen tests
-npm run build          # type-checks, then builds into dist/
-```
-
-If the levels change in `lean/Tactile/Levels.lean`, print them again:
-
-```bash
-docker compose -f docker/compose.yaml run --rm lean lake build Tactile
-docker compose -f docker/compose.yaml run --rm -T lean lake env lean --run Export.lean > apps/web/src/data/levels.json
+  lean.Dockerfile           the Lean image
+  compose.yaml              the `lean` service, with the limits for players' proofs
+deploy/
+  setup.sh, deploy.sh       one-time server setup; build and restart
+  Caddyfile                 HTTPS, the page, and /api forwarded to the API
+  tactile-api.service       the API as a systemd service
 ```
 
 ## Troubleshooting
+
+**`permission denied … docker.sock`**
+Your user isn't in the `docker` group. Run `sudo usermod -aG docker $USER`, then log out and back in. Until then, `sg docker -c "npm run fixtures"` runs one command with the group. Being in the `docker` group is effectively root on that machine.
+
+**"Unknown identifier" from Lean after changing a `.lean` file**
+The compiled library is stale. Run `lake build` again (step 1).
+
+**The game says "Proof checker offline"**
+The API isn't running, or can't start Docker. Check the terminal running `npm start` (locally) or `journalctl -u tactile-api` (on the server).
 
 **`invalid JSON` in `lake-manifest.json`, or other strange file errors**
 Your disk is probably full. Check with `df -h`. If `lean/lake-manifest.json` is empty (0 bytes), delete it, free some space, and build again.
 
 **`permission denied` writing to `lean/.lake` (Linux)**
-The container runs as user id `1000`. If your Linux user has a different id (check with `id -u`), the container can't write to the mounted folder. Ask the team. The fix is to build the image with your user id. Docker Desktop on macOS and Windows handles this automatically.
+The container runs as user id `1000`. If your Linux user has a different id (check with `id -u`), the container can't write to the mounted folder. The fix is to build the image with your user id. Docker Desktop on macOS and Windows handles this automatically.
 
 **No live proof view in VS Code**
 We run Lean only in Docker, so the VS Code Lean 4 extension (which needs Lean installed locally) isn't set up. Errors show up when you run `lake build`.
