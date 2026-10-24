@@ -1,3 +1,3 @@
 # expect: invalid helper 1
-# note: a helper name becomes a Lean keyword, so it must not clash with our tactics.
+# note: finish closes every proof, so a helper called finish would read as something else in the player's editor.
 # helper: macro "finish" : tactic => `(tactic| (rotate 1))

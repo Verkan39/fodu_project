@@ -59,25 +59,14 @@ const NAME = /^[a-z][a-z0-9]{1,15}$/;
 const PARAM = /^[a-z][a-z0-9]{0,15}$/;
 const NUMBER = /^[0-9]{1,4}$/;
 const HELPER =
-  /^macro\s+"([^"]*)"\s+(?:([^\s:]+)\s*:\s*num\s+)?:\s*tactic\s*=>\s*`\(tactic\|\s*(.*?)\s*\)$/;
+  /^macro\s+"([^"]*)"\s*(?:([^\s:]+)\s*:\s*num\s*)?:\s*tactic\s*=>\s*`\(tactic\|\s*(.*?)\s*\)$/;
 
 /**
- * Names a helper may not take. A helper name becomes a Lean keyword, so it must not clash with
- * our moves, the colours, the words in our file frame, or common Lean tactics. If something is
- * missed here, the clash makes Lean report an error outside the player's lines, and that is
- * never cleared (`verdict.ts`).
+ * Names a helper may not take, because they would read as something else in the player's own
+ * editor: our moves and colours, and `finish`, which closes every proof. Clashes with Lean are no
+ * concern here: the player's name never reaches Lean (`keyword` in `template.ts`).
  */
-const RESERVED = new Set<string>([
-  'swap', 'paint', 'rotate', 'finish', ...COLORS,
-  'import', 'open', 'theorem', 'example', 'def', 'by', 'at', 'macro', 'syntax', 'tactic', 'num',
-  'print', 'axioms', 'eval', 'sol', 'level', 'start', 'target',
-  'sorry', 'admit', 'decide', 'fail', 'first', 'exact', 'refine', 'apply', 'intro', 'intros',
-  'rfl', 'trivial', 'done', 'skip', 'repeat', 'try', 'simp', 'rw', 'have', 'show', 'calc',
-  'fun', 'let', 'in', 'do', 'then', 'else', 'if', 'match', 'with', 'where', 'end', 'from',
-  'this', 'only', 'using', 'case', 'next', 'all', 'any', 'focus', 'omega', 'constructor',
-  'exists', 'induction', 'cases', 'unfold', 'change', 'assumption', 'contradiction', 'exfalso',
-  'left', 'right', 'split', 'ext', 'funext', 'congr', 'namespace', 'section',
-]);
+const RESERVED = new Set<string>(['swap', 'paint', 'rotate', 'finish', ...COLORS]);
 
 type Problem = { reason: string };
 const problem = (reason: string): Problem => ({ reason });
@@ -237,11 +226,10 @@ export function parseScript(helperText: string, proofText: string): ParseResult 
   while (proofLines.length > 0 && stripComment(proofLines[proofLines.length - 1]) === '') {
     proofLines.pop();
   }
-  if (proofLines.length > LIMITS.proofLines) {
-    return fail('proof', LIMITS.proofLines + 1, `a proof may have at most ${LIMITS.proofLines} lines`);
-  }
 
   const proof: (Step | null)[] = [];
+  // Blank and comment lines don't count towards `proofLines`; `textLength` already bounds them.
+  let commands = 0;
   let expanded = 0;
   for (const [i, raw] of proofLines.entries()) {
     const line = i + 1;
@@ -250,6 +238,9 @@ export function parseScript(helperText: string, proofText: string): ParseResult 
     if (text === '') {
       proof.push(null);
       continue;
+    }
+    if (++commands > LIMITS.proofLines) {
+      return fail('proof', line, `a proof may have at most ${LIMITS.proofLines} commands`);
     }
     const step = parseStep(text.split(/\s+/), ctx);
     if (isProblem(step)) return fail('proof', line, step.reason);

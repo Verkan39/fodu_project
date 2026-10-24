@@ -7,7 +7,7 @@
  */
 import { countLines, parseScript } from './script.ts';
 import { buildFile, LIMIT_MARK, type LevelId, type Target } from './template.ts';
-import { runLean } from './lean.ts';
+import { LeanTimeout, runLean, TIME_LIMIT_SECONDS } from './lean.ts';
 import { classify, type LeanMessage, type Verdict } from './verdict.ts';
 
 export interface Attempt {
@@ -34,7 +34,14 @@ export async function verify(attempt: Attempt): Promise<Checked> {
   }
 
   const { source, layout } = buildFile(parsed.script, { level: attempt.level, target: attempt.target });
-  const messages = await runLean(source);
+  let messages: LeanMessage[];
+  try {
+    messages = await runLean(source);
+  } catch (err) {
+    // Any other failure means Lean couldn't run at all, which is our problem, not a verdict.
+    if (err instanceof LeanTimeout) return { verdict: { status: 'timeout', seconds: TIME_LIMIT_SECONDS }, source };
+    throw err;
+  }
   const verdict = classify(messages, layout);
 
   if (verdict.status === 'cleared') {
