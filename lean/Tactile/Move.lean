@@ -10,6 +10,11 @@ Every move has two pure functions (Learning Log, section 12):
 * `apply`: the new board after the move. It assumes the move is legal.
 
 `step` runs the check and then `apply`, so callers can never skip the check.
+
+**Numbering.** A move holds the cell numbers exactly as the player typed them, so they are
+**1-based**. Only `apply` converts to a list position (`n - 1`), and only after the legality
+check has rejected `0` and anything above the board size. This matters because subtraction on
+natural numbers stops at zero (`0 - 1 = 0`), so an unchecked `0` would silently become cell 1.
 -/
 
 namespace Tactile
@@ -42,8 +47,8 @@ where
 
 namespace Move
 
-/-- The cells a move touches. When a move is illegal, all of these turn red
-(Learning Log, decision B3). -/
+/-- The cells a move touches, as the player numbered them (1-based). When a move is illegal,
+all of these turn red (Learning Log, decision B3). -/
 def cells : Move → List Nat
   | swap a b  => [a, b]
   | paint i _ => [i]
@@ -53,7 +58,8 @@ def cells : Move → List Nat
 Pointless moves such as `swap 3 3` are legal (Learning Log, Entry 2). -/
 def whyIllegal (L : Level) (b : Board) (m : Move) : Option Illegal :=
   let touched := m.cells.eraseDups
-  let missing := touched.filter (· ≥ b.length)
+  -- Valid cells are 1 … b.length. Zero is rejected here, before `apply` can subtract.
+  let missing := touched.filter (fun c => c == 0 || c > b.length)
   let locked  := touched.filter (L.locked.contains ·)
   if !missing.isEmpty then some (.noSuchCell missing)
   else if !locked.isEmpty then some (.locked locked)
@@ -69,17 +75,23 @@ def Legal (L : Level) (b : Board) (m : Move) : Prop :=
 instance (L : Level) (b : Board) (m : Move) : Decidable (m.Legal L b) :=
   inferInstanceAs (Decidable (_ = none))
 
-/-- `apply`: the board after the move. It returns a new board and never changes the old one. -/
+/-- The list position (0-based) of a player's cell number (1-based). Only meaningful for
+numbers that passed the legality check; for `0` it would wrongly give position 0. -/
+def position (n : Nat) : Nat := n - 1
+
+/-- `apply`: the board after the move. It returns a new board and never changes the old one.
+It assumes the move is legal. -/
 def apply : Move → Board → Board
   | swap x y, b =>
     mapWithIndex (fun i blk =>
-      if i = x then b.getD y blk
-      else if i = y then b.getD x blk
+      if i = position x then b.getD (position y) blk
+      else if i = position y then b.getD (position x) blk
       else blk) b
   | paint i c, b =>
-    mapWithIndex (fun j blk => if j = i then { blk with color := c } else blk) b
+    mapWithIndex (fun j blk => if j = position i then { blk with color := c } else blk) b
   | rotate i, b =>
-    mapWithIndex (fun j blk => if j = i then { blk with facing := blk.facing + 1 } else blk) b
+    mapWithIndex
+      (fun j blk => if j = position i then { blk with facing := blk.facing + 1 } else blk) b
 
 /-- `step`: check the move, then apply it. -/
 def step (L : Level) (b : Board) (m : Move) : Except Illegal Board :=
@@ -105,10 +117,10 @@ def joinWords (conj : String) (ws : List String) : String :=
 
 /-- The player-facing message for an illegal move (Learning Log, decision D). -/
 def Illegal.message (L : Level) (b : Board) : Illegal → String
-  | .noSuchCell [c] => s!"Cell {c} doesn't exist. This board has cells 0–{b.length - 1}."
+  | .noSuchCell [c] => s!"Cell {c} doesn't exist. This board has cells 1–{b.length}."
   | .noSuchCell cs =>
     let which := joinWords "and" (cs.map toString)
-    s!"Cells {which} don't exist. This board has cells 0–{b.length - 1}."
+    s!"Cells {which} don't exist. This board has cells 1–{b.length}."
   | .locked [c] => s!"Cell {c} is locked and can't be moved, painted or rotated."
   | .locked cs =>
     let which := joinWords "and" (cs.map toString)

@@ -1,0 +1,2 @@
+# expect: illegal 1
+paint 10 blue

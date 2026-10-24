@@ -1,0 +1,11 @@
+{
+  "name": "tactile-server",
+  "private": true,
+  "type": "module",
+  "description": "Builds the Lean file for a player's proof and decides the verdict from Lean's output.",
+  "scripts": {
+    "test": "node --test \"test/*.test.ts\"",
+    "fixtures": "node scripts/run-fixtures.ts",
+    "check": "node scripts/check.ts"
+  }
+}

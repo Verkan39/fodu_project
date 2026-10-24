@@ -34,10 +34,11 @@ def runScript (title : String) (moves : List Move) : IO Unit := do
   IO.println ""
 
 def main : IO Unit := do
-  runScript "swap, paint, rotate" [.swap 0 2, .paint 2 .cyan, .rotate 2]
-  runScript "pointless moves are legal" [.swap 3 3, .paint 1 .cyan]
-  runScript "four rotations come back to the start" [.rotate 0, .rotate 0, .rotate 0, .rotate 0]
-  runScript "locked cell stops the run" [.swap 0 2, .rotate 4, .paint 2 .cyan]
-  runScript "cell that doesn't exist" [.swap 0 12]
-  runScript "two cells that don't exist" [.swap 10 12]
-  runScript "colour not in the palette" [.paint 2 .violet]
+  runScript "swap, paint, rotate" [.swap 1 3, .paint 3 .blue, .rotate 3]
+  runScript "pointless moves are legal" [.swap 4 4, .paint 2 .blue]
+  runScript "four rotations come back to the start" [.rotate 1, .rotate 1, .rotate 1, .rotate 1]
+  runScript "locked cell stops the run" [.swap 1 3, .rotate 5, .paint 3 .blue]
+  runScript "cell that doesn't exist" [.swap 1 13]
+  runScript "cell 0 doesn't exist (numbering starts at 1)" [.swap 0 3]
+  runScript "two cells that don't exist" [.swap 11 13]
+  runScript "colour not in the palette" [.paint 3 .pink]

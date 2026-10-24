@@ -1,0 +1,3 @@
+# expect: error
+# note: sorry closes the goal early, so our closing line fails with "No goals". Never cleared.
+sorry

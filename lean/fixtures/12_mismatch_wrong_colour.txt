@@ -1,0 +1,4 @@
+# expect: mismatch
+swap 1 3
+paint 3 green
+rotate 3

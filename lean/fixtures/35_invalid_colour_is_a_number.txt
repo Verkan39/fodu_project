@@ -1,0 +1,2 @@
+# expect: invalid 1
+paint 3 5

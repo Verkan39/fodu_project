@@ -1,0 +1,2 @@
+# expect: illegal 1
+rotate 5

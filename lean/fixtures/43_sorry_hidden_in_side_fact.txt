@@ -1,0 +1,6 @@
+# expect: rejected
+# note: the sorry sits in a side fact, so the moves still finish the proof. Caught by the hasSorry warning.
+have h : (1 : Nat) = 1 := sorry
+swap 1 3
+paint 3 blue
+rotate 3

@@ -1,0 +1,4 @@
+# expect: cleared
+swap 1 3
+paint 3 blue
+rotate 3

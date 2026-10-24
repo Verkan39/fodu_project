@@ -1,0 +1,6 @@
+# expect: cleared
+-- first move, indented with 4 spaces
+    swap 1 3
+
+	paint 3 blue   
+rotate 3

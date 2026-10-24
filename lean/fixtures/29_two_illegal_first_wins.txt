@@ -1,0 +1,4 @@
+# expect: illegal 2
+swap 1 3
+rotate 5
+paint 5 blue

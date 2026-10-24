@@ -4,12 +4,12 @@ import Tactile.Move
 # A sample level
 
 Shared by the tests and the demo. Drawn as text it looks like this
-(`[ ]` marks a locked cell):
+(`[ ]` marks a locked cell). Cell numbers are 1-based, as players see them:
 
 ```
- A↑  C↑  V→      cells 0 1 2
- J↑ [I↓] A←      cells 3 4 5
- C→  V↑  J↑      cells 6 7 8
+ Y↑  B↑  P→      cells 1 2 3
+ G↑ [W↓] Y←      cells 4 5 6
+ B→  P↑  G↑      cells 7 8 9
 ```
 -/
 
@@ -17,12 +17,16 @@ namespace Tactile.Examples
 
 def level : Level where
   width   := 3
-  locked  := [4]
-  palette := [.amber, .cyan, .jade]
+  locked  := [5]
+  palette := [.yellow, .blue, .green]
 
 def start : Board :=
-  [ ⟨.amber, 0⟩, ⟨.cyan, 0⟩,  ⟨.violet, 1⟩,
-    ⟨.jade, 0⟩,  ⟨.ivory, 2⟩, ⟨.amber, 3⟩,
-    ⟨.cyan, 1⟩,  ⟨.violet, 0⟩, ⟨.jade, 0⟩ ]
+  [ ⟨.yellow, 0⟩, ⟨.blue, 0⟩,  ⟨.pink, 1⟩,
+    ⟨.green, 0⟩,  ⟨.white, 2⟩, ⟨.yellow, 3⟩,
+    ⟨.blue, 1⟩,   ⟨.pink, 0⟩,  ⟨.green, 0⟩ ]
+
+/-- A target that `start` reaches with `swap 1 3`, `paint 3 blue`, `rotate 3`. -/
+def target : Board :=
+  [Move.swap 1 3, .paint 3 .blue, .rotate 3].foldl (fun b m => m.apply b) start
 
 end Tactile.Examples

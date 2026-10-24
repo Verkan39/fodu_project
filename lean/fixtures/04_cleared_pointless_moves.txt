@@ -1,0 +1,8 @@
+# expect: cleared
+# target: start
+swap 4 4
+paint 2 blue
+rotate 1
+rotate 1
+rotate 1
+rotate 1

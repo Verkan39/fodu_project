@@ -1,0 +1,3 @@
+# expect: invalid 2
+swap 1 3
+swpa 1 2
