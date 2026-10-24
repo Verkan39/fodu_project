@@ -1,0 +1,15 @@
+# Installed to /etc/systemd/system/ by setup.sh, which fills in @USER@ and @REPO@.
+[Unit]
+Description=Tactile API (checks proofs with Lean in Docker)
+Requires=docker.service
+After=docker.service
+
+[Service]
+# The user must be in the docker group: every proof runs in its own Lean container.
+User=@USER@
+WorkingDirectory=@REPO@/apps/server
+ExecStart=/usr/bin/node scripts/serve.ts
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

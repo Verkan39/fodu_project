@@ -49,7 +49,7 @@ describe('the app mounts without errors (this is what a blank page would break)'
     ['#/', 'Tactile'],
     ['#/levels', 'Choose a level'],
     ['#/rules', 'How it works'],
-    ['#/play/L1', 'Ready when you are'],
+    ['#/play/L1', 'First Steps'],
     ['#/play/L3', 'Helper slot'],
     ['#/play/L6', 'Everything'],
   ];

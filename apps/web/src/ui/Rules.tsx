@@ -51,7 +51,7 @@ export function Rules({ go }: { go: (r: Route) => void }) {
     <div className="screen">
       <div className="rules">
         <header>
-          <div><button className="btn secondary small" onClick={() => go({ name: 'title' })}><span aria-hidden="true">‹</span> Title</button></div>
+          <div><button className="btn secondary small" onClick={() => go({ name: 'title' })}><span aria-hidden="true">‹</span> Home</button></div>
           <div className="mid">
             <h1>How it works</h1>
             <p className="sub">Write moves. Watch the board. Match the target.</p>
@@ -96,7 +96,7 @@ export function Rules({ go }: { go: (r: Route) => void }) {
             </Card>
             <Card title="Facing">
               <Blocks specs={[['blue', 0], ['blue', 1], ['blue', 2], ['blue', 3]]} />
-              <p>The notch shows which way a block faces: up, right, down or left. Rotate turns it clockwise.</p>
+              <p>The arrow shows which way a block faces: up, right, down or left. Rotate turns it clockwise.</p>
             </Card>
             <Card title="Locked blocks">
               <Blocks specs={[['white', 2]]} locked />
@@ -104,7 +104,7 @@ export function Rules({ go }: { go: (r: Route) => void }) {
             </Card>
             <Card title="Colours">
               <Blocks specs={[['yellow', 0], ['blue', 0], ['pink', 0], ['green', 0], ['white', 0]]} />
-              <p>Each colour also has its own shape, so you never rely on colour alone. Some levels only let you paint with some colours: the Paint colours list shows which.</p>
+              <p>Some levels only let you paint with some colours: the Paint colours list shows which.</p>
             </Card>
           </div>
         </Section>
@@ -174,7 +174,7 @@ export function Rules({ go }: { go: (r: Route) => void }) {
         </Section>
 
         <div className="footer-actions">
-          <button className="btn secondary" onClick={() => go({ name: 'title' })}>Back to title</button>
+          <button className="btn secondary" onClick={() => go({ name: 'title' })}>Back to home</button>
           <button className="btn primary" onClick={() => go({ name: 'levels' })}>Choose a level <span aria-hidden="true">›</span></button>
         </div>
       </div>

@@ -1,0 +1,15 @@
+# Installed to /etc/caddy/Caddyfile by setup.sh, which fills in @DOMAIN@. Caddy gets the HTTPS certificate itself.
+@DOMAIN@ {
+	encode gzip zstd
+
+	@api path /api/* /healthz
+	handle @api {
+		reverse_proxy 127.0.0.1:3001
+	}
+
+	# The app routes with the URL hash, so every page is a real file and needs no index.html fallback.
+	handle {
+		root * /var/www/tactile
+		file_server
+	}
+}

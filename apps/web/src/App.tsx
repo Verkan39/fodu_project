@@ -4,7 +4,7 @@ import { loadProgress, saveProgress } from './engine/progress.ts';
 import { leanVerifier } from './engine/lean.ts';
 import type { Source } from './engine/verify.ts';
 import { fromHash, toHash, type Route } from './route.ts';
-import { appReducer, emptyDraft, type AppState } from './state.ts';
+import { appReducer, startDraft, type AppState } from './state.ts';
 import { LevelMap } from './ui/LevelMap.tsx';
 import { PlayScreen } from './ui/Play.tsx';
 import { Rules } from './ui/Rules.tsx';
@@ -57,7 +57,7 @@ export default function App() {
         <PlayScreen
           key={level.id}
           level={level}
-          draft={app.drafts[level.id] ?? emptyDraft}
+          draft={app.drafts[level.id] ?? startDraft(level.id)}
           progress={app.progress}
           verifier={verifier}
           onDraft={(field, text) => dispatch({ type: 'draft', level: level.id, field, text })}

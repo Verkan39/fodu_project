@@ -105,9 +105,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .block { transition: background-color 0.35s ease; }
 
 .block .orient { position: absolute; inset: 0; }
-.block .notch { position: absolute; left: 35.4%; top: 14.6%; width: 29.2%; height: 16.7%; fill: var(--edge); }
-.block .glyph-pos { position: absolute; left: 34.5%; top: 44.5%; width: 31%; height: 31%; }
-.block .glyph { width: 100%; height: 100%; color: var(--edge); fill: currentColor; display: block; }
+.block .arrow { position: absolute; left: 25%; top: 25%; width: 50%; height: 50%; fill: var(--edge); stroke: var(--edge); stroke-width: 1.5; stroke-linejoin: round; }
 
 .block.locked::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit;
@@ -172,9 +170,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .map-screen { --px: 1px; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: calc(24 * var(--px)); padding: calc(24 * var(--px)) 0; min-height: calc(94 * var(--px)); }
 .topbar .left { display: flex; align-items: center; gap: calc(18 * var(--px)); flex: 1; }
-.topbar .right { flex: 1; display: flex; justify-content: flex-end; }
+.topbar .right { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: calc(12 * var(--px)); }
 .topbar .mid { display: flex; align-items: center; gap: calc(12 * var(--px)); }
-.brand { font-size: calc(28 * var(--px)); line-height: calc(36 * var(--px)); font-weight: 500; }
+.brand { font-size: calc(28 * var(--px)); line-height: calc(36 * var(--px)); font-weight: 500; color: inherit; text-decoration: none; }
 .level-title { font-size: calc(28 * var(--px)); line-height: calc(36 * var(--px)); font-weight: 500; }
 
 h2.h2 { font-size: calc(28 * var(--px)); line-height: calc(36 * var(--px)); font-weight: 500; }
@@ -233,8 +231,8 @@ h3.h3 { font-size: calc(20 * var(--px)); line-height: calc(28 * var(--px)); font
 /* proof column */
 .editors { display: flex; flex-direction: column; gap: calc(14 * var(--px)); }
 .ed-label { display: flex; align-items: baseline; gap: calc(8 * var(--px)); margin-bottom: calc(8 * var(--px)); }
-.cm-wrap { border-radius: calc(14 * var(--px)); overflow: hidden; background: var(--ink); }
-.cm-wrap.helper { background: var(--code-helper); }
+.cm-wrap { --cm-bg: var(--ink); border-radius: calc(14 * var(--px)); overflow: hidden; background: var(--cm-bg); }
+.cm-wrap.helper { --cm-bg: var(--code-helper); }
 .hint { font-size: calc(13 * var(--px)); line-height: calc(18 * var(--px)); color: var(--ink-soft); margin-top: calc(12 * var(--px)); }
 
 .cm-editor { color: var(--on-dark); font-family: var(--mono); font-size: calc(18 * var(--px)); background: transparent; }
@@ -249,7 +247,8 @@ h3.h3 { font-size: calc(20 * var(--px)); line-height: calc(28 * var(--px)); font
 /* Error lines also carry a word ("illegal" / "invalid") before the red dot, about 90 units in all, so they
    reserve more room on the right; otherwise a long line runs underneath the label. */
 .cm-wrap .cm-editor .cm-line.line-error { padding-right: calc(110 * var(--px)); }
-.cm-wrap .cm-editor .cm-gutters { background: transparent; border: none; color: #6f6458; font-family: var(--mono); font-size: calc(14 * var(--px)); }
+/* Opaque, so long lines scroll under the line numbers instead of through them. */
+.cm-wrap .cm-editor .cm-gutters { background: var(--cm-bg); border: none; color: #6f6458; font-family: var(--mono); font-size: calc(14 * var(--px)); }
 .cm-gutterElement { padding-left: calc(18 * var(--px)) !important; padding-right: calc(6 * var(--px)) !important; }
 .cm-activeLine, .cm-activeLineGutter { background: transparent; }
 .cm-wrap .cm-editor .cm-placeholder { color: #85796c; }
@@ -280,6 +279,8 @@ h3.h3 { font-size: calc(20 * var(--px)); line-height: calc(28 * var(--px)); font
 
 /* ---------- title ---------- */
 
+/* .title already fills the window; the usual bottom padding would add a scroll. */
+.title-screen { padding-bottom: 0; }
 .title { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, calc(560 * var(--px))); gap: calc(56 * var(--px)); align-items: center; min-height: 100vh; padding: 0 calc(96 * var(--px)); /* extra side space on the title page only */ }
 .title .copy { display: flex; flex-direction: column; gap: calc(22 * var(--px)); align-items: flex-start; }
 .title h1 { font-size: clamp(calc(64 * var(--px)), 8vw, calc(104 * var(--px))); line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
@@ -310,6 +311,7 @@ h3.h3 { font-size: calc(20 * var(--px)); line-height: calc(28 * var(--px)); font
 .tile .tag { align-self: flex-start; background: var(--paper-shade); border-radius: calc(999 * var(--px)); padding: calc(2 * var(--px)) calc(12 * var(--px)); font-size: calc(12 * var(--px)); line-height: calc(18 * var(--px)); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; color: var(--ink-soft); }
 .tile .preview { margin: calc(12 * var(--px)) auto 0; flex: 1; display: grid; place-items: center; }
 .tile .foot { display: flex; align-items: center; justify-content: space-between; gap: calc(12 * var(--px)); min-height: calc(40 * var(--px)); }
+.tile .foot .status { display: flex; align-items: center; gap: calc(16 * var(--px)); }
 .marker { display: inline-flex; align-items: center; gap: calc(8 * var(--px)); font-size: calc(13 * var(--px)); line-height: calc(18 * var(--px)); font-weight: 500; letter-spacing: 0.02em; }
 .marker i { width: calc(24 * var(--px)); height: calc(24 * var(--px)); border-radius: 50%; background: var(--green); display: grid; place-items: center; }
 

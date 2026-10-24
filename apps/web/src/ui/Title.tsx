@@ -11,7 +11,7 @@ const sample: Block[] = SAMPLE_BLOCKS.map(([color, turns], id) => ({ id, color, 
 export function Title({ go, source }: { go: (r: Route) => void; source: Source }) {
   const hero = LEVELS[0]!;
   return (
-    <div className="screen">
+    <div className="screen title-screen">
       <div className="title">
         <div className="copy">
           <div className="mini-row">

@@ -7,6 +7,7 @@ import type { LineMark } from './ui/Editor.tsx';
 import { cellsOf } from './engine/moves.ts';
 import type { RunResult } from './engine/run.ts';
 import type { Verified } from './engine/verify.ts';
+import { LEVEL_META } from './engine/levels.ts';
 import { recordClear, type Progress } from './engine/progress.ts';
 import type { Board, Level, LevelId } from './engine/types.ts';
 
@@ -31,14 +32,26 @@ export type AppAction =
 
 export const emptyDraft: Draft = { helpers: '', proof: '' };
 
+/** Comment lines start a level's helper slot, so the syntax is in view while writing one. */
+const HELPER_HINT = [
+  '-- One helper per line:',
+  '-- macro "name" : tactic => `(tactic| (move; move))',
+  '-- With a cell number, use $i in the moves:',
+  '-- macro "name " i:num : tactic => `(tactic| (move $i))',
+  '',
+].join('\n');
+
+/** What a level's editors hold before the player types anything. */
+export const startDraft = (level: LevelId): Draft => (LEVEL_META[level].helpers ? { helpers: HELPER_HINT, proof: '' } : emptyDraft);
+
 export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case 'draft': {
-      const old = state.drafts[action.level] ?? emptyDraft;
+      const old = state.drafts[action.level] ?? startDraft(action.level);
       return { ...state, drafts: { ...state.drafts, [action.level]: { ...old, [action.field]: action.text } } };
     }
     case 'clearDraft':
-      return { ...state, drafts: { ...state.drafts, [action.level]: emptyDraft } };
+      return { ...state, drafts: { ...state.drafts, [action.level]: startDraft(action.level) } };
     case 'cleared':
       return { ...state, progress: recordClear(state.progress, action.level, action.lines) };
   }

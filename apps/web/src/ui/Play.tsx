@@ -7,7 +7,7 @@ import type { Progress } from '../engine/progress.ts';
 import type { Outcome } from '../engine/run.ts';
 import type { Verifier } from '../engine/verify.ts';
 import type { Level, LevelId } from '../engine/types.ts';
-import type { Route } from '../route.ts';
+import { toHash, type Route } from '../route.ts';
 import {
   boardFrame,
   differingCells,
@@ -18,6 +18,7 @@ import {
   redCells,
   ringCells,
   shownBoard,
+  startDraft,
   type Draft,
   type Play as PlayPhase,
 } from '../state.ts';
@@ -105,7 +106,7 @@ export function PlayScreen({ level, draft, progress, verifier, onDraft, onClear,
   const red = redCells(play);
   const diff = differingCells(play);
   const outcome = play.phase === 'done' ? play.run.outcome : undefined;
-  const nothingToClear = draft.helpers.trim() === '' && draft.proof.trim() === '' && play.phase === 'ready';
+  const nothingToClear = draft.helpers.trim() === startDraft(level.id).helpers.trim() && draft.proof.trim() === '' && play.phase === 'ready';
 
   const onProofClick = (line: number) => {
     if (play.phase !== 'done') return;
@@ -120,13 +121,14 @@ export function PlayScreen({ level, draft, progress, verifier, onDraft, onClear,
           <button className="btn secondary small" onClick={() => go({ name: 'levels' })}>
             <span aria-hidden="true">‹</span> Levels
           </button>
-          <span className="brand">Tactile</span>
+          <a className="brand" href={toHash({ name: 'title' })}>Tactile</a>
         </div>
         <div className="mid">
           <span className="badge-num">{level.id.slice(1)}</span>
           <h1 className="level-title">{meta.name}</h1>
         </div>
         <div className="right">
+          <button className="btn secondary small" onClick={() => go({ name: 'rules' })}>How it works</button>
           <span className="pill" title="Helper steps and proof lines both count">
             Lines {lines ?? '–'}
             {level.lineLimit !== null && <span className="quiet">/ {level.lineLimit} allowed</span>}
@@ -140,7 +142,7 @@ export function PlayScreen({ level, draft, progress, verifier, onDraft, onClear,
           <div className="panel-head">
             <div className="titles">
               <h2 className="h2">Board</h2>
-              <p className="sub">Numbers show the cell. The notch shows which way a block faces.</p>
+              <p className="sub">Numbers show the cell. The arrow shows which way a block faces.</p>
             </div>
           </div>
           <div className="board-row">
@@ -255,17 +257,11 @@ interface PanelProps {
 }
 
 function VerdictPanel({ play, level, progress, go, replay }: PanelProps) {
-  const meta = LEVEL_META[level.id];
+  // An empty live region stays mounted so screen readers announce the first verdict.
+  if (play.phase === 'ready') return <div role="status" aria-live="polite" />;
   let view: { cls: string; badge: ReactNode; title: string; text: string; note?: string; actions?: ReactNode };
 
-  if (play.phase === 'ready') {
-    view = {
-      cls: 'ready',
-      badge: <PlayIcon />,
-      title: 'Ready when you are',
-      text: `Turn the board into the target picture. Write your moves, one per line, then press Run.${meta.helpers ? ' Repeating yourself? Name the repeat in the helper slot.' : ''}`,
-    };
-  } else if (play.phase === 'checking') {
+  if (play.phase === 'checking') {
     view = {
       cls: 'running',
       badge: '…',

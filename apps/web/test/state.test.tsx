@@ -16,6 +16,7 @@ import {
   redCells,
   ringCells,
   shownBoard,
+  startDraft,
   type PlayAction,
   type PlayState,
 } from '../src/state.ts';
@@ -23,6 +24,7 @@ import { LevelMap } from '../src/ui/LevelMap.tsx';
 import { PlayScreen } from '../src/ui/Play.tsx';
 import { Rules } from '../src/ui/Rules.tsx';
 import { Title } from '../src/ui/Title.tsx';
+import { countLines, parseScript } from '../../server/src/script.ts';
 
 const L1 = levelById('L1');
 const L2 = levelById('L2');
@@ -116,6 +118,20 @@ describe('the app state', () => {
     expect(a.drafts.L3?.helpers).toBe('macro ...');
   });
 
+  it('starts helper levels with a syntax comment that costs no lines, and Reset brings it back', () => {
+    expect(startDraft('L1')).toEqual(emptyDraft);
+    const hint = startDraft('L3').helpers;
+    expect(hint).toContain('macro "name"');
+    const spin = 'macro "spin3" : tactic => `(tactic| (rotate 1; rotate 2; rotate 3))';
+    const lines = (helpers: string) => {
+      const p = parseScript(helpers, 'spin3');
+      return p.ok ? countLines(p.script) : undefined;
+    };
+    expect(lines(hint + spin)).toBe(lines(spin));
+    const a = appReducer({ progress: emptyProgress, drafts: { L3: { helpers: spin, proof: '' } } }, { type: 'clearDraft', level: 'L3' });
+    expect(a.drafts.L3?.helpers).toBe(hint);
+  });
+
   it('records a clear in the progress', () => {
     const a = appReducer({ progress: emptyProgress, drafts: {} }, { type: 'cleared', level: 'L2', lines: 3 });
     expect(a.progress).toEqual(recordClear(emptyProgress, 'L2', 3));
@@ -164,7 +180,7 @@ describe('every screen renders without crashing', () => {
         <PlayScreen level={level} draft={emptyDraft} progress={emptyProgress} verifier={browserVerifier}
           onDraft={noop} onClear={noop} onCleared={noop} go={noop} />,
       );
-      expect(html).toContain('Ready when you are');
+      expect(html).not.toContain('class="verdict');
       expect(html).toContain('Reset');
       // the helper slot only exists where helpers are taught
       expect(html.includes('Helper slot')).toBe(level.id !== 'L1' && level.id !== 'L2');

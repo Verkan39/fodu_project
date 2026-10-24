@@ -8,3 +8,8 @@ services:
     volumes:
       - ../lean:/work
     working_dir: /work
+    # The API runs players' proofs here, so cap what one run can reach and use.
+    network_mode: none
+    mem_limit: 1g
+    cpus: 1
+    pids_limit: 64
