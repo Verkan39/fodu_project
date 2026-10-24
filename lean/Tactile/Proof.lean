@@ -67,7 +67,9 @@ macro_rules
     `(tactic| refine Tactile.Reach.step (Tactile.Move.swap $a $b)
         (by first | decide | fail "tactile:illegal") ?_)
   | `(tactic| paint $i $c) =>
-    let color := Lean.mkIdentFrom c (`Tactile.Color ++ c.getId)
+    -- Inside a helper the colour word comes from a macro quotation, so hygiene tags it with a
+    -- hidden scope (`green✝`). Erase it so it still names `Tactile.Color.green`.
+    let color := Lean.mkIdentFrom c (`Tactile.Color ++ c.getId.eraseMacroScopes)
     `(tactic| refine Tactile.Reach.step (Tactile.Move.paint $i $color)
         (by first | decide | fail "tactile:illegal") ?_)
   | `(tactic| rotate $i) =>

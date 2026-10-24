@@ -1,5 +1,5 @@
-# expect: rejected
-# note: the sorry sits in a side fact, so the moves still finish the proof. Caught by the hasSorry warning.
+# expect: invalid 1
+# note: a side fact with sorry is rejected by the server's parser; the axiom check in verdict.ts stays as a backstop.
 have h : (1 : Nat) = 1 := sorry
 swap 1 3
 paint 3 blue

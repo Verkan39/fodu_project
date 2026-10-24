@@ -1,4 +1,4 @@
 # expect: invalid 2
-# note: Lean hides the illegal move on line 1 when line 2 has a syntax error, so the typo is reported first
+# note: the server parses the whole proof before Lean runs, so a typo anywhere is reported before any illegal move
 rotate 5
 swpa 1 2

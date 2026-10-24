@@ -1,0 +1,12 @@
+# expect: tooLong
+# level: L3
+# note: correct, but 9 lines against a limit of 6, so the helper is required.
+rotate 1
+rotate 1
+rotate 1
+rotate 2
+rotate 2
+rotate 2
+rotate 3
+rotate 3
+rotate 3

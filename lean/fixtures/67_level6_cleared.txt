@@ -1,0 +1,11 @@
+# expect: cleared
+# level: L6
+# helper: macro "back " i:num : tactic => `(tactic| (rotate $i; rotate $i; rotate $i))
+swap 6 11
+paint 6 white
+swap 2 14
+swap 3 15
+back 1
+back 4
+back 13
+back 16

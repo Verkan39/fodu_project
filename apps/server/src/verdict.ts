@@ -17,6 +17,7 @@
  * The markers are the first words of the message that `lean/Tactile/Proof.lean` produces.
  */
 import type { Layout } from './template.ts';
+import type { Editor } from './script.ts';
 
 export interface LeanMessage {
   severity: 'error' | 'warning' | 'information';
@@ -34,8 +35,13 @@ export type Verdict =
   | { status: 'mismatch' }
   /** A move broke a rule. `line` is the editor line (1-based). */
   | { status: 'illegal'; line: number }
-  /** Not a command we understand. `line` is the editor line (1-based). */
-  | { status: 'invalid'; line: number }
+  /**
+   * Not a command we understand. `line` is the editor line (1-based). `editor` and `reason` are
+   * set when our parser rejected the text before Lean ran (`script.ts`); `editor` absent = proof.
+   */
+  | { status: 'invalid'; line: number; editor?: Editor; reason?: string }
+  /** The proof is correct but uses more lines than the level allows. */
+  | { status: 'tooLong'; lines: number; limit: number }
   /** The proof compiled but cheated (`sorry`, or an axiom we don't allow). */
   | { status: 'rejected'; reason: string }
   /** Lean said something we don't know how to read. Never counts as cleared. */

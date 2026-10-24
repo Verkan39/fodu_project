@@ -1,0 +1,3 @@
+# expect: invalid helper 1
+# note: the helper area sits at the top level of the file, where #eval could run commands. Only our helper shape is accepted.
+# helper: #eval IO.println "top-level code ran"

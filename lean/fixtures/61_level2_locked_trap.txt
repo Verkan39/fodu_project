@@ -1,0 +1,6 @@
+# expect: illegal 1
+# level: L2
+# note: the obvious source of pink is the locked centre.
+swap 2 5
+paint 9 green
+rotate 3

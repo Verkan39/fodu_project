@@ -1,0 +1,10 @@
+# expect: mismatch
+# level: L5
+# note: fix 7 before the swap paints over the only movable pink, so every move is legal but the target can't be reached.
+# helper: macro "fix " i:num : tactic => `(tactic| (paint $i green; rotate $i; rotate $i))
+fix 7
+swap 2 7
+fix 1
+fix 4
+fix 13
+fix 16

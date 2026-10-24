@@ -1,0 +1,6 @@
+# expect: cleared
+# level: L3
+# helper: macro "spin3" : tactic => `(tactic| (rotate 1; rotate 2; rotate 3))
+spin3
+spin3
+spin3

@@ -1,0 +1,5 @@
+# expect: cleared
+# level: L1
+swap 2 8
+rotate 4
+paint 6 green

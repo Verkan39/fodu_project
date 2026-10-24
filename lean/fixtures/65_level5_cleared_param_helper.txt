@@ -1,0 +1,9 @@
+# expect: cleared
+# level: L5
+# helper: macro "fix " i:num : tactic => `(tactic| (paint $i green; rotate $i; rotate $i))
+swap 2 7
+fix 7
+fix 1
+fix 4
+fix 13
+fix 16

@@ -1,0 +1,6 @@
+# expect: invalid helper 3
+# note: nested helpers grow exponentially (16, 256, 512, ...). Over 300 moves is refused before Lean runs.
+# helper: macro "hone" : tactic => `(tactic| (rotate 1; rotate 1; rotate 1; rotate 1; rotate 1; rotate 1; rotate 1; rotate 1; rotate 1; rotate 1; rotate 1; rotate 1; rotate 1; rotate 1; rotate 1; rotate 1))
+# helper: macro "htwo" : tactic => `(tactic| (hone; hone; hone; hone; hone; hone; hone; hone; hone; hone; hone; hone; hone; hone; hone; hone))
+# helper: macro "hthree" : tactic => `(tactic| (htwo; htwo))
+hthree
