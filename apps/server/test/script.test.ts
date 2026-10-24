@@ -119,11 +119,31 @@ test('helper text that is not exactly our helper shape is rejected', () => {
   }
 });
 
-test('helper names that would clash with our moves, colours or Lean are refused', () => {
-  for (const name of ['swap', 'finish', 'blue', 'decide', 'sorry', 'target', 'by', 'sol']) {
+test('helper names that would read as our moves, colours or finish are refused', () => {
+  for (const name of ['swap', 'paint', 'rotate', 'finish', 'blue']) {
     assert.equal(helperLine(`macro "${name}" : tactic => \`(tactic| (rotate 1))`), 1, name);
   }
   assert.equal(helperLine(`${SPIN3}\n${SPIN3}`), 2);
+});
+
+test('names that are Lean words are fine, because they never reach Lean (template.ts)', () => {
+  for (const name of ['grind', 'decide', 'sorry', 'target', 'by', 'sol']) {
+    const r = parseScript(`macro "${name}" : tactic => \`(tactic| (rotate 1))`, name);
+    assert.ok(r.ok, name);
+  }
+});
+
+test('the helper shape allows spacing variations', () => {
+  for (const text of [
+    'macro "spin3": tactic => `(tactic| (rotate 1))',
+    'macro "spin3":tactic=>`(tactic|(rotate 1))',
+    'macro "fix" i:num: tactic => `(tactic| (rotate $i))',
+    'macro "fix "i : num : tactic => `(tactic| (rotate $i))',
+  ]) {
+    assert.ok(parseScript(text, '').ok, text);
+  }
+  // ...but the parameter must still be a `num`.
+  assert.equal(helperLine('macro "fix" i:numx : tactic => `(tactic| (rotate $i))'), 1);
 });
 
 test('nested helpers that would expand to too many moves are refused', () => {
@@ -140,6 +160,10 @@ test('nested helpers that would expand to too many moves are refused', () => {
 
 test('size limits', () => {
   assert.equal(proofLine('rotate 1\n'.repeat(LIMITS.proofLines + 1)), LIMITS.proofLines + 1);
+  // Blank and comment lines don't count towards the limit, but the line number is the editor's.
+  const commented = '-- note\n\nrotate 1\n'.repeat(LIMITS.proofLines);
+  assert.ok(parseScript('', commented).ok);
+  assert.equal(proofLine(`${commented}rotate 1`), 3 * LIMITS.proofLines + 1);
   assert.equal(proofLine(`rotate 1 -- ${'x'.repeat(LIMITS.lineLength)}`), 1);
   const tooMany = Array.from({ length: LIMITS.helpers + 1 }, (_, i) =>
     `macro "h${i}x" : tactic => \`(tactic| (rotate 1))`,

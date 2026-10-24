@@ -13,11 +13,12 @@
  *   --messages             also show what Lean said, one line per message
  *   --source               also show the Lean file we generated
  *
- * Exit code: 0 if cleared, 1 for any other verdict, 2 for a usage mistake.
+ * Exit code: 0 if cleared, 1 for any other verdict, 2 for a usage mistake or if Lean couldn't run.
  */
 import { parseArgs } from 'node:util';
 import { readFileSync } from 'node:fs';
 import { isLevelId, LEVELS, type LevelId, type Target } from '../src/template.ts';
+import { parseScript } from '../src/script.ts';
 import { runLean } from '../src/lean.ts';
 import { verify } from '../src/verify.ts';
 import type { Verdict } from '../src/verdict.ts';
@@ -92,20 +93,24 @@ if (!isLevelId(level)) {
 }
 const helperText = (values.helper ?? []).join('\n');
 
+// Text the parser rejects gets its verdict without Lean, so don't start Lean just to draw the
+// boards: a typo then gets an answer even where Docker isn't available.
+const reachesLean = parseScript(helperText, text).ok;
+
 // The check and the board drawing are independent, so run them side by side.
 const [checked, boards] = await Promise.all([
   verify({ helpers: helperText, proof: text, level, target }),
-  drawBoards(level, target),
-]);
+  reachesLean ? drawBoards(level, target) : undefined,
+]).catch(cannotRun);
 const { verdict, source, messages } = checked;
 
 // If the boards can't be drawn, the level itself is broken, so a verdict would mean nothing.
-if (!boards.ok) {
+if (boards !== undefined && !boards.ok) {
   console.error(`Could not draw the boards: ${boards.reason}`);
   process.exit(2);
 }
 
-console.log(boards.text);
+console.log(boards?.text ?? "(Boards not drawn: the text was rejected before Lean ran.)\n");
 
 // Show the proof with line numbers, and mark the line the verdict points at.
 const lines = text.split(/\r?\n/);
@@ -123,7 +128,8 @@ console.log(`\nVerdict: ${describe(verdict, lines)}`);
 
 if (values.messages) {
   console.log('\nLean said:');
-  if (messages === undefined) console.log("  (Lean didn't run: the text was rejected first)");
+  if (verdict.status === 'timeout') console.log('  (Lean was stopped before it finished)');
+  else if (messages === undefined) console.log("  (Lean didn't run: the text was rejected first)");
   else if (messages.length === 0) console.log('  (nothing)');
   for (const m of messages ?? []) {
     const where = `${m.pos.line}:${m.pos.column}`;
@@ -136,6 +142,12 @@ if (values.source && source !== undefined) {
 }
 
 process.exit(verdict.status === 'cleared' ? 0 : 1);
+
+/** Lean couldn't run at all (no Docker, say). Say so in one line instead of a stack trace. */
+function cannotRun(err: unknown): never {
+  console.error(`Could not run Lean: ${err instanceof Error ? err.message : String(err)}`);
+  process.exit(2);
+}
 
 /**
  * The start board and the target board, drawn by Lean (`Board.render`, the same function the
@@ -196,6 +208,8 @@ function describe(v: Verdict, proof: string[]): string {
       return `TOO LONG. The proof is correct but uses ${v.lines} lines, and this level allows ${v.limit}.`;
     case 'rejected':
       return `REJECTED. The proof compiled but cheats: ${v.reason}.`;
+    case 'timeout':
+      return `TIMEOUT. Lean didn't finish checking within ${v.seconds} seconds.`;
     case 'error':
       return `ERROR. Lean said something we can't read: ${v.detail}`;
   }

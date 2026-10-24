@@ -44,6 +44,8 @@ export type Verdict =
   | { status: 'tooLong'; lines: number; limit: number }
   /** The proof compiled but cheated (`sorry`, or an axiom we don't allow). */
   | { status: 'rejected'; reason: string }
+  /** Lean didn't finish within the time limit. Never counts as cleared. */
+  | { status: 'timeout'; seconds: number }
   /** Lean said something we don't know how to read. Never counts as cleared. */
   | { status: 'error'; detail: string };
 

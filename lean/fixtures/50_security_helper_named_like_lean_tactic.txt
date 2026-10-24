@@ -1,0 +1,7 @@
+# expect: cleared
+# level: L3
+# note: grind is also a Lean tactic. The player's helper name never reaches Lean (it is printed as tactile_h1), so it can't change what the line does.
+# helper: macro "grind" : tactic => `(tactic| (rotate 1; rotate 2; rotate 3))
+grind
+grind
+grind
